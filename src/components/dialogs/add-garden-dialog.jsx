@@ -15,22 +15,31 @@ import {
 import { gardenSchema } from "src/schemas/garden.schemas";
 import { addGarden } from "src/actions/gardens/gardens.actions";
 
-
 function AddGardenDialog({ teamId }) {
+  if (!teamId) {
+    return (
+      <button
+        disabled
+        className="rounded-full bg-gray-300 px-4 py-2 text-white cursor-not-allowed"
+      >
+        + Add Garden
+      </button>
+    );
+  }
+
   const [open, setOpen] = useState(false);
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm ({
+  } = useForm({
     resolver: zodResolver(gardenSchema),
     defaultValues: { team_id: teamId, garden_name: "", garden_location: "" },
   });
 
   const onSubmit = async (data) => {
     try {
-      console.log("Add Garden", data);
       await addGarden(data);
       toast.success("Garden added!");
       reset();

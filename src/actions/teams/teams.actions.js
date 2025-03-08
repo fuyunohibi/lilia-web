@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "src/utils/supabase/server";
 
 export async function addTeam(data) {
@@ -13,6 +14,8 @@ export async function addTeam(data) {
     console.error("Error adding team via RPC:", error.message);
     return { error: error.message };
   }
+
+  revalidatePath("/");
   return { success: true };
 }
 

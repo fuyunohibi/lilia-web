@@ -21,7 +21,6 @@ export default function HomePageContent({ currentUser }) {
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [teamDetails, setTeamDetails] = useState(null);
 
-  // Placeholder plant icons (update or fetch as needed)
   const plantIcons = [
     "/assets/images/plants/plant-1.png",
     "/assets/images/plants/plant-2.png",
@@ -29,7 +28,6 @@ export default function HomePageContent({ currentUser }) {
     "/assets/images/plants/plant-4.png",
   ];
 
-  // Fetch current user's teams on mount
   useEffect(() => {
     async function fetchTeams() {
       if (currentUser?.user_id) {
@@ -47,7 +45,6 @@ export default function HomePageContent({ currentUser }) {
     fetchTeams();
   }, [currentUser]);
 
-  // When a team is selected, fetch its detailed information
   useEffect(() => {
     async function fetchTeamDetails() {
       if (selectedTeam && selectedTeam.team_id) {
@@ -224,7 +221,6 @@ export default function HomePageContent({ currentUser }) {
       {/* RIGHT SECTION: Team Selection & Garden Details */}
       <section className="w-full p-6 md:w-1/2">
         <div className="mx-auto max-w-md">
-          {/* Header: Team Select & Add Team */}
           <div className="flex items-center justify-between">
             <select
               value={selectedTeam?.team_id || ""}
@@ -247,33 +243,37 @@ export default function HomePageContent({ currentUser }) {
           </p>
 
           {/* Garden Details for the Selected Team */}
-          <div className="mt-4 border p-4 rounded-3xl shadow">
-            <div className="flex items-center justify-between">
-              <p className="text-lg font-semibold text-[#00A35B]">
-                {teamDetails &&
-                teamDetails.gardens &&
-                teamDetails.gardens.length > 0
-                  ? teamDetails.gardens
-                      .map((item) => item.garden.garden_name)
-                      .join(", ")
-                  : "No garden available"}
-              </p>
-              <AddSensorDialog />
-            </div>
+          {teamDetails?.gardens && teamDetails.gardens.length > 0 && (
+            <>
+              {teamDetails.gardens.map((garden) => (
+                <div
+                  key={garden.garden.garden_id}
+                  className="mt-4 border p-4 rounded-3xl shadow"
+                >
+                  <div className="flex items-start justify-between">
+                    <p className="text-2xl font-semibold text-[#00A35B]">
+                      {garden.garden.garden_name}
+                    </p>
+                    <AddSensorDialog />
+                  </div>
 
-            {/* Smart Devices Card (Mocked) */}
-            <div className="mt-4 flex flex-col rounded-3xl bg-white p-4 shadow">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-[#00A35B]">
-                  Smart Devices
-                </h2>
-                <span className="text-sm text-gray-500">3 Active</span>
-              </div>
-              <p className="mt-4 text-sm text-gray-600">
-                Monitor humidity, soil moisture, and temperature automatically.
-              </p>
-            </div>
-          </div>
+                  {/* Smart Devices Card (Mocked) */}
+                  <div className="mt-4 flex flex-col rounded-3xl bg-white p-4 shadow">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-lg font-semibold text-[#00A35B]">
+                        Smart Devices
+                      </h2>
+                      <span className="text-sm text-gray-500">3 Active</span>
+                    </div>
+                    <p className="mt-4 text-sm text-gray-600">
+                      Monitor humidity, soil moisture, and temperature
+                      automatically.
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
 
           <div className="mt-6 flex justify-center items-center">
             <AddGardenDialog teamId={selectedTeam?.team_id || ""} />

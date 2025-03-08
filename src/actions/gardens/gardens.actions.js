@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "src/utils/supabase/server";
 
 export async function addGarden(data) {
@@ -15,5 +16,7 @@ export async function addGarden(data) {
     console.error("Error adding garden via RPC:", error.message);
     return { error: error.message };
   }
+
+  revalidatePath("/");
   return { success: true };
 }
