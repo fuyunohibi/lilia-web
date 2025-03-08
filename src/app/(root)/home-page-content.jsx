@@ -11,6 +11,8 @@ import {
   getCurrentUserTeams,
   getTeamDetails,
 } from "src/actions/teams/teams.actions";
+import AddSensorDialog from "src/components/dialogs/add-sensor-dialog";
+import AddPlantDialog from "src/components/dialogs/add-plant-dialog";
 
 export default function HomePageContent({ currentUser }) {
   const [loggingOut, setLoggingOut] = useState(false);
@@ -121,13 +123,16 @@ export default function HomePageContent({ currentUser }) {
           {/* Cards: Home Garden, Smart Devices */}
           {/* Home Garden Card */}
           <div className="mt-6 flex flex-col rounded-3xl bg-white p-4 shadow">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-[#00A35B]">
-                Our Plants
-              </h2>
-              <span className="text-sm text-gray-500">
-                {plantIcons.length} Plants
-              </span>
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-[#00A35B]">
+                  Our Plants
+                </h2>
+                <span className="text-sm text-gray-500">
+                  {plantIcons.length} Plants
+                </span>
+              </div>
+              <AddPlantDialog />
             </div>
             <div className="mt-6 mb-2 grid grid-cols-4 gap-2">
               {plantIcons.slice(0, 4).map((icon, i) => (
@@ -253,7 +258,7 @@ export default function HomePageContent({ currentUser }) {
                       .join(", ")
                   : "No garden available"}
               </p>
-              <AddGardenDialog teamId={selectedTeam?.team_id || ""} />
+              <AddSensorDialog />
             </div>
 
             {/* Smart Devices Card (Mocked) */}

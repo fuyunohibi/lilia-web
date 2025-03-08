@@ -78,7 +78,7 @@ function AddPlantDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className="rounded-full bg-[#00A35B] px-4 py-2 text-white hover:bg-[#029b56]">
+        <button className="rounded-full bg-yellow-500 px-4 py-2 text-white hover:bg-[#029b56]">
           + Add Plant
         </button>
       </DialogTrigger>

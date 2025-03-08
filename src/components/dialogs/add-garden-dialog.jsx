@@ -34,7 +34,7 @@ function AddGardenDialog({ teamId }) {
       await addGarden(data);
       toast.success("Garden added!");
       reset();
-      setOpen(false); // close dialog on success
+      setOpen(false);
     } catch (error) {
       console.error("Error adding garden", error);
       toast.error("Failed to add garden");
