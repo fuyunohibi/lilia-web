@@ -6,13 +6,12 @@ import Link from "next/link";
 import { signout } from "src/actions/auth/authentication.actions";
 import AddTeamDialog from "src/components/dialogs/add-team-dialog";
 import AddGardenDialog from "src/components/dialogs/add-garden-dialog";
+import AddSensorDialog from "src/components/dialogs/add-sensor-dialog";
 // import AddPlantDialog from "src/components/dialogs/add-plant-dialog";
 import {
   getCurrentUserTeams,
   getTeamDetails,
 } from "src/actions/teams/teams.actions";
-import AddSensorDialog from "src/components/dialogs/add-sensor-dialog";
-import AddPlantDialog from "src/components/dialogs/add-plant-dialog";
 
 export default function HomePageContent({ currentUser }) {
   const [loggingOut, setLoggingOut] = useState(false);
@@ -46,7 +45,7 @@ export default function HomePageContent({ currentUser }) {
   }, [currentUser]);
 
   useEffect(() => {
-    async function fetchTeamDetails() {
+    async function fetchDetails() {
       if (selectedTeam && selectedTeam.team_id) {
         const result = await getTeamDetails(selectedTeam.team_id);
         if (result.data) {
@@ -54,9 +53,11 @@ export default function HomePageContent({ currentUser }) {
         } else {
           console.error("Error fetching team details", result.error);
         }
+      } else {
+        setTeamDetails(null);
       }
     }
-    fetchTeamDetails();
+    fetchDetails();
   }, [selectedTeam]);
 
   const handleLogout = async () => {
@@ -118,34 +119,50 @@ export default function HomePageContent({ currentUser }) {
           </p>
 
           {/* Cards: Home Garden, Smart Devices */}
-          {/* Home Garden Card */}
-          <div className="mt-6 flex flex-col rounded-3xl bg-white p-4 shadow">
-            <div className="flex items-start justify-between">
-              <div>
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* Home Garden Card */}
+            <div className="flex flex-col rounded-3xl bg-white p-4 shadow">
+              <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-[#00A35B]">
-                  Our Plants
+                  {teamDetails?.gardens && teamDetails.gardens.length > 0
+                    ? teamDetails.gardens
+                        .map((item) => item.garden.garden_name)
+                        .join(", ")
+                    : "Home Garden"}
                 </h2>
                 <span className="text-sm text-gray-500">
                   {plantIcons.length} Plants
                 </span>
               </div>
-              <AddPlantDialog />
+              <div className="mt-4 flex items-center space-x-2">
+                {plantIcons.slice(0, 4).map((icon, i) => (
+                  <div
+                    key={i}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100"
+                  >
+                    <Image
+                      src={icon}
+                      alt={`Plant ${i}`}
+                      width={500}
+                      height={500}
+                      className="object-cover rounded-full"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="mt-6 mb-2 grid grid-cols-4 gap-2">
-              {plantIcons.slice(0, 4).map((icon, i) => (
-                <div
-                  key={i}
-                  className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-100"
-                >
-                  <Image
-                    src={icon}
-                    alt={`Plant ${i}`}
-                    width={500}
-                    height={500}
-                    className="object-cover rounded-full"
-                  />
-                </div>
-              ))}
+
+            {/* Smart Devices Card (Mocked) */}
+            <div className="flex flex-col rounded-3xl bg-white p-4 shadow">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-[#00A35B]">
+                  Smart Devices
+                </h2>
+                <span className="text-sm text-gray-500">3 Active</span>
+              </div>
+              <p className="mt-4 text-sm text-gray-600">
+                Monitor humidity, soil moisture, and temperature automatically.
+              </p>
             </div>
           </div>
 
@@ -218,9 +235,10 @@ export default function HomePageContent({ currentUser }) {
         </div>
       </section>
 
-      {/* RIGHT SECTION: Team Selection & Garden Details */}
+      {/* RIGHT SECTION: Team Selection, Members & Garden Details */}
       <section className="w-full p-6 md:w-1/2">
         <div className="mx-auto max-w-md">
+          {/* Header: Team Select & Add Team */}
           <div className="flex items-center justify-between">
             <select
               value={selectedTeam?.team_id || ""}
@@ -238,41 +256,50 @@ export default function HomePageContent({ currentUser }) {
             </select>
             <AddTeamDialog currentUser={currentUser} />
           </div>
-          <p className="mt-1 text-gray-600">
-            {selectedTeam ? selectedTeam.members.length : 0} Members
-          </p>
+          <div className="mt-2">
+            <h3 className="text-lg font-medium text-gray-700">Members ({teamDetails?.team?.members?.length || 0})</h3>
+            {teamDetails?.team?.members &&
+            teamDetails.team.members.length > 0 ? (
+              <ul className="mt-2 space-y-2">
+                {teamDetails.team.members.map((member) => (
+                  <li key={member.user_id} className="flex items-center gap-2">
+                    <div className="relative h-8 w-8 overflow-hidden rounded-full bg-gray-200">
+                      <Image
+                        src={member.avatar_url}
+                        alt={member.username}
+                        fill
+                        sizes="32px"
+                        style={{ objectFit: "cover" }}
+                      />
+                    </div>
+                    <span className="text-sm text-gray-700">
+                      {member.username}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-gray-500">No members available</p>
+            )}
+          </div>
 
           {/* Garden Details for the Selected Team */}
-          {teamDetails?.gardens && teamDetails.gardens.length > 0 && (
-            <>
-              {teamDetails.gardens.map((garden) => (
-                <div
-                  key={garden.garden.garden_id}
-                  className="mt-4 border p-4 rounded-3xl shadow"
-                >
-                  <div className="flex items-start justify-between">
-                    <p className="text-2xl font-semibold text-[#00A35B]">
-                      {garden.garden.garden_name}
-                    </p>
-                    <AddSensorDialog />
-                  </div>
-
-                  {/* Smart Devices Card (Mocked) */}
-                  <div className="mt-4 flex flex-col rounded-3xl bg-white p-4 shadow">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-semibold text-[#00A35B]">
-                        Smart Devices
-                      </h2>
-                      <span className="text-sm text-gray-500">3 Active</span>
-                    </div>
-                    <p className="mt-4 text-sm text-gray-600">
-                      Monitor humidity, soil moisture, and temperature
-                      automatically.
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </>
+          {teamDetails?.gardens && teamDetails.gardens.length > 0 ? (
+            <div className="mt-4 border p-4 rounded-3xl shadow flex items-center justify-between">
+              <p className="text-lg font-semibold text-[#00A35B]">
+                {teamDetails.gardens
+                  .map((item) => item.garden.garden_name)
+                  .join(", ")}
+              </p>
+              <AddSensorDialog />
+            </div>
+          ) : (
+            <div className="mt-4 border p-4 rounded-3xl shadow flex items-center justify-between">
+              <p className="text-lg font-semibold text-[#00A35B]">
+                No garden available
+              </p>
+              <AddSensorDialog />
+            </div>
           )}
 
           <div className="mt-6 flex justify-center items-center">
