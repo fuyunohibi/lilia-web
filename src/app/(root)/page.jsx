@@ -24,11 +24,11 @@ const HomePage = async () => {
             />
             Your browser does not support the video tag.
           </video>
-          <div className="flex flex-col items-center justify-center">
+          <div className="z-10 flex flex-col items-center justify-center">
             <h1 className="text-3xl font-bold mb-4 text-center text-white">
               Welcome to Lilia <br /> The Smart Garden
             </h1>
-            <p className="text-gray-300 mb-4">
+            <p className="text-neutral-600 mb-4">
               Please sign up or log in to access your dashboard.
             </p>
             <Link
