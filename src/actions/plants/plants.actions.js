@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase-client";
+import { createClient } from "src/utils/supabase/server";
 
 export async function addPlant(data) {
   const supabase = await createClient();

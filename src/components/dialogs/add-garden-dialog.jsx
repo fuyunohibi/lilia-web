@@ -6,7 +6,6 @@ import {
   DialogTrigger,
   DialogContent,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
   DialogClose,
 } from "src/components/ui/dialog";
@@ -34,9 +33,6 @@ function AddGardenDialog() {
         <DialogTitle className="text-center text-2xl font-bold text-gray-800">
           Add Garden
         </DialogTitle>
-        <DialogDescription className="text-center text-sm text-gray-600">
-          Enter garden details below.
-        </DialogDescription>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div>
             <label

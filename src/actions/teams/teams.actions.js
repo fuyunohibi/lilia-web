@@ -1,12 +1,11 @@
 "use server";
 
-import { createClient } from "@/lib/supabase-client";
+import { createClient } from "src/utils/supabase/server";
 
 export async function addTeam(data) {
   const supabase = await createClient();
-
   const { error } = await supabase.rpc("add_team", {
-    p_team_name: data.team_name,
+    p_team_name: data.teamName,
     p_members: data.members,
   });
 
@@ -15,16 +14,4 @@ export async function addTeam(data) {
     return { error: error.message };
   }
   return { success: true };
-}
-
-export async function getTeamDetails(teamId) {
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("get_team_details", {
-    p_team_id: teamId,
-  });
-  if (error) {
-    console.error("Error fetching team details:", error.message);
-    return { error: error.message };
-  }
-  return { data };
 }

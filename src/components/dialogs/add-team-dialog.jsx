@@ -1,6 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import Image from "next/image";
 import {
   Dialog,
   DialogTrigger,
@@ -11,15 +15,27 @@ import {
   DialogClose,
 } from "src/components/ui/dialog";
 import { getAllUsers } from "src/actions/users/users.actions";
-import Image from "next/image";
+import { addTeam } from "src/actions/teams/teams.actions";
+import { teamSchema } from "src/schemas/team.schemas";
 
 function AddTeamDialog({ currentUser }) {
-  const [teamName, setTeamName] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedMembers, setSelectedMembers] = useState([]);
-  const [allUsers, setAllUsers] = useState([]);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(teamSchema),
+    defaultValues: { teamName: "", members: [] },
+  });
 
-  // Fetch all users on component mount
+  const [open, setOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [allUsers, setAllUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+
   useEffect(() => {
     async function fetchUsers() {
       const result = await getAllUsers();
@@ -32,49 +48,61 @@ function AddTeamDialog({ currentUser }) {
     fetchUsers();
   }, []);
 
-  // Filter users based on search term and exclude the current user
-  const filteredUsers = allUsers.filter((user) => {
-    const matchesSearch = user.username
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const isNotSelf = !currentUser || user.user_id !== currentUser.user_id;
-    return matchesSearch && isNotSelf;
-  });
+  useEffect(() => {
+    const fUsers = allUsers.filter((user) => {
+      const matchesSearch = user.username
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const isNotSelf = !currentUser || user.user_id !== currentUser.user_id;
+      return matchesSearch && isNotSelf;
+    });
+    setFilteredUsers(fUsers);
+  }, [searchTerm, allUsers, currentUser]);
+
+  const members = watch("members");
 
   const handleToggleUser = (user) => {
-    if (selectedMembers.find((member) => member.user_id === user.user_id)) {
-      setSelectedMembers(
-        selectedMembers.filter((member) => member.user_id !== user.user_id)
+    if (members.includes(user.user_id)) {
+      setValue(
+        "members",
+        members.filter((id) => id !== user.user_id)
       );
     } else {
-      setSelectedMembers([...selectedMembers, user]);
+      setValue("members", [...members, user.user_id]);
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Replace with your addTeam action call.
-    console.log("Add Team", { teamName, members: selectedMembers });
-    setTeamName("");
-    setSelectedMembers([]);
-    setSearchTerm("");
-  };
+ const onSubmit = async (data) => {
+   if (currentUser && !data.members.includes(currentUser.user_id)) {
+     data.members.push(currentUser.user_id);
+   }
+   try {
+     console.log("Add Team", data);
+     await addTeam(data);
+     toast.success("Team added!");
+     reset();
+     setSearchTerm("");
+     setOpen(false); 
+   } catch (error) {
+     console.error("Error adding team", error);
+   }
+ };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <button className="rounded-full bg-[#00A35B] px-4 py-2 text-white hover:bg-[#029b56]">
           + Add Team
         </button>
       </DialogTrigger>
-      <DialogContent className="">
+      <DialogContent>
         <DialogTitle className="text-center text-2xl font-bold text-gray-800">
           Add Team
         </DialogTitle>
         <DialogDescription className="text-center text-sm text-gray-600">
           Enter team details below.
         </DialogDescription>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
           <div>
             <label
               htmlFor="teamName"
@@ -86,10 +114,14 @@ function AddTeamDialog({ currentUser }) {
               id="teamName"
               type="text"
               placeholder="Team Name"
-              value={teamName}
-              onChange={(e) => setTeamName(e.target.value)}
+              {...register("teamName")}
               className="w-full rounded-2xl border border-gray-300 p-3 focus:border-[#00A35B] focus:outline-none"
             />
+            {errors.teamName && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.teamName.message}
+              </p>
+            )}
           </div>
           <div>
             <label
@@ -112,10 +144,8 @@ function AddTeamDialog({ currentUser }) {
               <div
                 key={user.user_id}
                 onClick={() => handleToggleUser(user)}
-                className={`flex justify-start items-center gap-2 cursor-pointer p-2 rounded-sm transition-colors ${
-                  selectedMembers.find(
-                    (member) => member.user_id === user.user_id
-                  )
+                className={`flex items-center gap-2 cursor-pointer p-2 rounded-sm transition-colors ${
+                  members.includes(user.user_id)
                     ? "bg-[#00A35B] text-white"
                     : "hover:bg-gray-100"
                 }`}
@@ -134,7 +164,10 @@ function AddTeamDialog({ currentUser }) {
               <p className="text-sm text-gray-500">No users found.</p>
             )}
           </div>
-          <DialogFooter className="">
+          {errors.members && (
+            <p className="text-sm text-red-500">{errors.members.message}</p>
+          )}
+          <DialogFooter>
             <button
               type="submit"
               className="w-full rounded-full bg-[#00A35B] px-4 py-2 text-white hover:bg-[#029b56]"
