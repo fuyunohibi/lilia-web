@@ -158,7 +158,7 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="flex min-h-screen font-serif">
+    <main className="flex min-h-screen">
       <section className="hidden md:flex w-1/2 relative pl-5 py-5">
         <video
           autoPlay

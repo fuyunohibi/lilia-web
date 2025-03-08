@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { signout } from "src/actions/auth/authentication.actions";
 
+import AddTeamDialog from "src/components/dialogs/add-team-dialog";
+import AddGardenDialog from "src/components/dialogs/add-garden-dialog";
+import AddPlantDialog from "src/components/dialogs/add-plant-dialog";
+
+// ----------------- HomePageContent Component -----------------
 export default function HomePageContent({ currentUser }) {
   const [loggingOut, setLoggingOut] = useState(false);
   const [activeTab, setActiveTab] = useState("today");
@@ -28,13 +33,6 @@ export default function HomePageContent({ currentUser }) {
     }
   };
 
-  const handleAddGarden = () => {
-    console.log("Add Garden modal or flow goes here!");
-  };
-  const handleAddTeam = () => {
-    console.log("Add Team modal or flow goes here!");
-  };
-
   return (
     <div className="font-serif flex min-h-screen flex-col bg-gray-50 text-gray-800 md:flex-row">
       {/* LEFT SECTION: Dashboard */}
@@ -43,7 +41,6 @@ export default function HomePageContent({ currentUser }) {
           {/* Header: Greeting + Avatar */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              {/* Avatar */}
               <div className="relative h-10 w-10 overflow-hidden rounded-full bg-gray-200">
                 {currentUser.avatar_url ? (
                   <Image
@@ -61,7 +58,6 @@ export default function HomePageContent({ currentUser }) {
                 Hey {currentUser?.full_name ?? "Guest"}
               </h1>
             </div>
-
             {currentUser ? (
               <button
                 onClick={handleLogout}
@@ -79,12 +75,11 @@ export default function HomePageContent({ currentUser }) {
               </Link>
             )}
           </div>
-
           <p className="mt-2 text-gray-600">
             Welcome back to your Smart Garden!
           </p>
 
-          {/* Cards: Home Garden, Smart Devices (example) */}
+          {/* Cards: Home Garden, Smart Devices */}
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Home Garden Card */}
             <div className="flex flex-col rounded-lg bg-white p-4 shadow">
@@ -114,7 +109,7 @@ export default function HomePageContent({ currentUser }) {
               </div>
             </div>
 
-            {/* Smart Devices Card (optional example) */}
+            {/* Smart Devices Card */}
             <div className="flex flex-col rounded-lg bg-white p-4 shadow">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-[#00A35B]">
@@ -123,12 +118,12 @@ export default function HomePageContent({ currentUser }) {
                 <span className="text-sm text-gray-500">3 Active</span>
               </div>
               <p className="mt-4 text-sm text-gray-600">
-                Track humidity, soil moisture, and temperature automatically.
+                Monitor humidity, soil moisture, and temperature automatically.
               </p>
             </div>
           </div>
 
-          {/* Tabs: Today / This Week / This Month */}
+          {/* Tabs */}
           <div className="mt-6 flex space-x-4 text-sm font-medium">
             <button
               onClick={() => setActiveTab("today")}
@@ -162,7 +157,7 @@ export default function HomePageContent({ currentUser }) {
             </button>
           </div>
 
-          {/* Daily / Weekly / Monthly Tasks */}
+          {/* Tasks */}
           <div className="mt-4 space-y-3">
             {activeTab === "today" && (
               <>
@@ -245,26 +240,14 @@ export default function HomePageContent({ currentUser }) {
               <span className="text-sm text-gray-500">
                 Need more automation?
               </span>
-              <button className="rounded-full bg-[#00A35B] px-4 py-1 text-sm font-medium text-white hover:bg-[#029b56]">
-                Add Sensor
-              </button>
+              <AddPlantDialog />
             </div>
           </div>
 
           {/* Actions: Add Garden, Add Team */}
           <div className="mt-6 flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
-            <button
-              onClick={handleAddGarden}
-              className="w-full rounded-full bg-[#00A35B] px-4 py-2 text-white hover:bg-[#029b56] sm:w-auto"
-            >
-              + Add Garden
-            </button>
-            <button
-              onClick={handleAddTeam}
-              className="w-full rounded-full bg-[#00A35B] px-4 py-2 text-white hover:bg-[#029b56] sm:w-auto"
-            >
-              + Add Team
-            </button>
+            <AddGardenDialog />
+            <AddTeamDialog />
           </div>
         </div>
       </section>
