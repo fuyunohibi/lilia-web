@@ -7,13 +7,17 @@ import { signout } from "src/actions/auth/authentication.actions";
 import AddTeamDialog from "src/components/dialogs/add-team-dialog";
 import AddGardenDialog from "src/components/dialogs/add-garden-dialog";
 // import AddPlantDialog from "src/components/dialogs/add-plant-dialog";
-import { getCurrentUserTeams } from "src/actions/teams/teams.actions";
+import {
+  getCurrentUserTeams,
+  getTeamDetails,
+} from "src/actions/teams/teams.actions";
 
 export default function HomePageContent({ currentUser }) {
   const [loggingOut, setLoggingOut] = useState(false);
   const [activeTab, setActiveTab] = useState("today");
   const [teams, setTeams] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState(null);
+  const [teamDetails, setTeamDetails] = useState(null);
 
   // Placeholder plant icons (update or fetch as needed)
   const plantIcons = [
@@ -40,6 +44,21 @@ export default function HomePageContent({ currentUser }) {
     }
     fetchTeams();
   }, [currentUser]);
+
+  // When a team is selected, fetch its detailed information
+  useEffect(() => {
+    async function fetchTeamDetails() {
+      if (selectedTeam && selectedTeam.team_id) {
+        const result = await getTeamDetails(selectedTeam.team_id);
+        if (result.data) {
+          setTeamDetails(result.data);
+        } else {
+          console.error("Error fetching team details", result.error);
+        }
+      }
+    }
+    fetchTeamDetails();
+  }, [selectedTeam]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -100,46 +119,31 @@ export default function HomePageContent({ currentUser }) {
           </p>
 
           {/* Cards: Home Garden, Smart Devices */}
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {/* Home Garden Card */}
-            <div className="flex flex-col rounded-3xl bg-white p-4 shadow">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-[#00A35B]">
-                  Home Garden
-                </h2>
-                <span className="text-sm text-gray-500">
-                  {plantIcons.length} Plants
-                </span>
-              </div>
-              <div className="mt-4 flex items-center space-x-2">
-                {plantIcons.slice(0, 4).map((icon, i) => (
-                  <div
-                    key={i}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100"
-                  >
-                    <Image
-                      src={icon}
-                      alt={`Plant ${i}`}
-                      width={500}
-                      height={500}
-                      className="object-cover rounded-full"
-                    />
-                  </div>
-                ))}
-              </div>
+          {/* Home Garden Card */}
+          <div className="mt-6 flex flex-col rounded-3xl bg-white p-4 shadow">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-[#00A35B]">
+                Our Plants
+              </h2>
+              <span className="text-sm text-gray-500">
+                {plantIcons.length} Plants
+              </span>
             </div>
-
-            {/* Smart Devices Card (Mocked) */}
-            <div className="flex flex-col rounded-3xl bg-white p-4 shadow">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-[#00A35B]">
-                  Smart Devices
-                </h2>
-                <span className="text-sm text-gray-500">3 Active</span>
-              </div>
-              <p className="mt-4 text-sm text-gray-600">
-                Monitor humidity, soil moisture, and temperature automatically.
-              </p>
+            <div className="mt-6 mb-2 grid grid-cols-4 gap-2">
+              {plantIcons.slice(0, 4).map((icon, i) => (
+                <div
+                  key={i}
+                  className="flex h-20 w-20 items-center justify-center rounded-full bg-gray-100"
+                >
+                  <Image
+                    src={icon}
+                    alt={`Plant ${i}`}
+                    width={500}
+                    height={500}
+                    className="object-cover rounded-full"
+                  />
+                </div>
+              ))}
             </div>
           </div>
 
@@ -237,11 +241,37 @@ export default function HomePageContent({ currentUser }) {
             {selectedTeam ? selectedTeam.members.length : 0} Members
           </p>
 
-          <div className="mt-4 border p-4 rounded-3xl shadow flex items-center justify-between">
-            <p className="text-lg font-semibold text-[#00A35B]">
-              {selectedTeam ? selectedTeam.team_name : "No team selected"}
-            </p>
-            <AddGardenDialog teamId={selectedTeam?.team_id} />
+          {/* Garden Details for the Selected Team */}
+          <div className="mt-4 border p-4 rounded-3xl shadow">
+            <div className="flex items-center justify-between">
+              <p className="text-lg font-semibold text-[#00A35B]">
+                {teamDetails &&
+                teamDetails.gardens &&
+                teamDetails.gardens.length > 0
+                  ? teamDetails.gardens
+                      .map((item) => item.garden.garden_name)
+                      .join(", ")
+                  : "No garden available"}
+              </p>
+              <AddGardenDialog teamId={selectedTeam?.team_id || ""} />
+            </div>
+
+            {/* Smart Devices Card (Mocked) */}
+            <div className="mt-4 flex flex-col rounded-3xl bg-white p-4 shadow">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-[#00A35B]">
+                  Smart Devices
+                </h2>
+                <span className="text-sm text-gray-500">3 Active</span>
+              </div>
+              <p className="mt-4 text-sm text-gray-600">
+                Monitor humidity, soil moisture, and temperature automatically.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-center items-center">
+            <AddGardenDialog teamId={selectedTeam?.team_id || ""} />
           </div>
         </div>
       </section>
