@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -10,20 +10,29 @@ import {
   DialogFooter,
   DialogClose,
 } from "src/components/ui/dialog";
-
-const allUsers = [
-  { user_id: "uuid1", username: "john_doe" },
-  { user_id: "uuid2", username: "jane_doe" },
-  { user_id: "uuid3", username: "alex_smith" },
-  { user_id: "uuid4", username: "sam_wilson" },
-];
+import { getAllUsers } from "src/actions/users/users.actions";
+import Image from "next/image";
 
 function AddTeamDialog({ currentUser }) {
   const [teamName, setTeamName] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMembers, setSelectedMembers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
 
-  // exclude the current user
+  // Fetch all users on component mount
+  useEffect(() => {
+    async function fetchUsers() {
+      const result = await getAllUsers();
+      if (result.data) {
+        setAllUsers(result.data);
+      } else {
+        console.error("Error fetching users", result.error);
+      }
+    }
+    fetchUsers();
+  }, []);
+
+  // Filter users based on search term and exclude the current user
   const filteredUsers = allUsers.filter((user) => {
     const matchesSearch = user.username
       .toLowerCase()
@@ -103,7 +112,7 @@ function AddTeamDialog({ currentUser }) {
               <div
                 key={user.user_id}
                 onClick={() => handleToggleUser(user)}
-                className={`cursor-pointer p-2 rounded transition-colors ${
+                className={`flex justify-start items-center gap-2 cursor-pointer p-2 rounded-sm transition-colors ${
                   selectedMembers.find(
                     (member) => member.user_id === user.user_id
                   )
@@ -111,6 +120,13 @@ function AddTeamDialog({ currentUser }) {
                     : "hover:bg-gray-100"
                 }`}
               >
+                <Image
+                  src={user.avatar_url}
+                  alt={user.username}
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
                 {user.username}
               </div>
             ))}

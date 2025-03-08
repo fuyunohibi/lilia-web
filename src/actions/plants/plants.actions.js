@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase-client";
 
 export async function addPlant(data) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { error } = await supabase.rpc("add_plant", {
     p_garden_id: data.garden_id,

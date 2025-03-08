@@ -82,7 +82,7 @@ export async function getCurrentUser() {
 
 
 export async function getAllUsers() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_all_users");
   if (error) {
     console.error("Error fetching users:", error);

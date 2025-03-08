@@ -4,22 +4,36 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { signout } from "src/actions/auth/authentication.actions";
-
 import AddTeamDialog from "src/components/dialogs/add-team-dialog";
 import AddGardenDialog from "src/components/dialogs/add-garden-dialog";
-import AddPlantDialog from "src/components/dialogs/add-plant-dialog";
+// import AddPlantDialog from "src/components/dialogs/add-plant-dialog";
 
-// ----------------- HomePageContent Component -----------------
 export default function HomePageContent({ currentUser }) {
   const [loggingOut, setLoggingOut] = useState(false);
   const [activeTab, setActiveTab] = useState("today");
 
+  // Remove mock plant icons if you plan to fetch them; for now we keep them as placeholder.
   const plantIcons = [
     "/assets/images/plants/plant-1.png",
     "/assets/images/plants/plant-2.png",
     "/assets/images/plants/plant-3.png",
     "/assets/images/plants/plant-4.png",
   ];
+
+  // Dummy teams data; replace with real data later.
+  const [teams] = useState([
+    {
+      team_id: "team1",
+      team_name: "Team A",
+      members: ["john_doe", "jane_doe"],
+    },
+    {
+      team_id: "team2",
+      team_name: "Team B",
+      members: ["alex_smith", "sam_wilson"],
+    },
+  ]);
+  const [selectedTeam, setSelectedTeam] = useState(teams[0]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -192,62 +206,46 @@ export default function HomePageContent({ currentUser }) {
         </div>
       </section>
 
-      {/* RIGHT SECTION: Home Garden Details */}
+      {/* RIGHT SECTION: Team Selection & Garden Details */}
       <section className="w-full p-6 md:w-1/2">
         <div className="mx-auto max-w-md">
-          <h2 className="text-2xl font-bold text-[#00A35B]">Home Garden</h2>
-          <p className="mt-1 text-gray-600">{plantIcons.length} Plants</p>
-
-          {/* Plant Icons */}
-          <div className="mt-4 flex flex-wrap gap-3">
-            {plantIcons.map((icon, i) => (
-              <div
-                key={i}
-                className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100"
+          {/* Header: Team Select */}
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-[#00A35B]">Home Garden</h2>
+            <div className="flex items-center space-x-2">
+              <select
+                value={selectedTeam?.team_id || ""}
+                onChange={(e) => {
+                  const team = teams.find((t) => t.team_id === e.target.value);
+                  setSelectedTeam(team);
+                }}
+                className="rounded-lg border border-gray-300 p-2 focus:border-[#00A35B] focus:outline-none"
               >
-                <Image
-                  src={icon}
-                  alt={`Plant ${i}`}
-                  width={500}
-                  height={500}
-                  className="object-cover rounded-full"
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Selected Plant Details */}
-          <div className="mt-6 rounded-lg bg-white p-4 shadow">
-            <h3 className="text-xl font-semibold text-[#00A35B]">Plant Name</h3>
-            <ul className="mt-2 space-y-1 text-sm text-gray-600">
-              <li>
-                <strong>Description:</strong> Beautiful indoor plant
-              </li>
-              <li>
-                <strong>Location:</strong> Near window
-              </li>
-              <li>
-                <strong>Sunlight requirement:</strong> Partial sunlight
-              </li>
-              <li>
-                <strong>Watering requirement:</strong> Twice a week
-              </li>
-              <li>
-                <strong>Schedule:</strong> Monday &amp; Thursday
-              </li>
-            </ul>
-            <div className="mt-4 flex items-center justify-between">
-              <span className="text-sm text-gray-500">
-                Need more automation?
-              </span>
-              <AddPlantDialog />
+                {teams.map((team) => (
+                  <option key={team.team_id} value={team.team_id}>
+                    {team.team_name}
+                  </option>
+                ))}
+              </select>
+              <AddTeamDialog currentUser={currentUser} />
             </div>
           </div>
+          <p className="mt-1 text-gray-600">
+            {selectedTeam ? selectedTeam.members.length : 0} Members
+          </p>
 
-          {/* Actions: Add Garden, Add Team */}
-          <div className="mt-6 flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
+          {/* Optional: Garden details for the selected team */}
+          <div className="mt-4 border p-4 rounded shadow">
+            <p className="text-lg font-semibold text-[#00A35B]">
+              {selectedTeam ? selectedTeam.team_name : "No team selected"}
+            </p>
+            {/* Here you could display garden(s) for the team */}
+            <p className="text-sm text-gray-500">Garden details go here.</p>
+          </div>
+
+          {/* Actions: Add Garden */}
+          <div className="mt-6">
             <AddGardenDialog />
-            <AddTeamDialog />
           </div>
         </div>
       </section>
