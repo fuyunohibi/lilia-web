@@ -6,8 +6,7 @@ export async function addGarden(data) {
   const supabase = await createClient();
 
   const { error } = await supabase.rpc("add_garden", {
-    p_user_id: data.user_id || null,
-    p_team_id: data.team_id || null,
+    p_team_id: data.team_id,
     p_garden_name: data.garden_name,
     p_garden_location: data.garden_location,
   });

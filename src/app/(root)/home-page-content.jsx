@@ -1,18 +1,21 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { signout } from "src/actions/auth/authentication.actions";
 import AddTeamDialog from "src/components/dialogs/add-team-dialog";
 import AddGardenDialog from "src/components/dialogs/add-garden-dialog";
 // import AddPlantDialog from "src/components/dialogs/add-plant-dialog";
+import { getCurrentUserTeams } from "src/actions/teams/teams.actions";
 
 export default function HomePageContent({ currentUser }) {
   const [loggingOut, setLoggingOut] = useState(false);
   const [activeTab, setActiveTab] = useState("today");
+  const [teams, setTeams] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState(null);
 
-  // Remove mock plant icons if you plan to fetch them; for now we keep them as placeholder.
+  // Placeholder plant icons (update or fetch as needed)
   const plantIcons = [
     "/assets/images/plants/plant-1.png",
     "/assets/images/plants/plant-2.png",
@@ -20,20 +23,23 @@ export default function HomePageContent({ currentUser }) {
     "/assets/images/plants/plant-4.png",
   ];
 
-  // Dummy teams data; replace with real data later.
-  const [teams] = useState([
-    {
-      team_id: "team1",
-      team_name: "Team A",
-      members: ["john_doe", "jane_doe"],
-    },
-    {
-      team_id: "team2",
-      team_name: "Team B",
-      members: ["alex_smith", "sam_wilson"],
-    },
-  ]);
-  const [selectedTeam, setSelectedTeam] = useState(teams[0]);
+  // Fetch current user's teams on mount
+  useEffect(() => {
+    async function fetchTeams() {
+      if (currentUser?.user_id) {
+        const result = await getCurrentUserTeams(currentUser.user_id);
+        if (result.data) {
+          setTeams(result.data);
+          if (result.data.length > 0) {
+            setSelectedTeam(result.data[0]);
+          }
+        } else {
+          console.error("Error fetching teams", result.error);
+        }
+      }
+    }
+    fetchTeams();
+  }, [currentUser]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -56,7 +62,7 @@ export default function HomePageContent({ currentUser }) {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="relative h-10 w-10 overflow-hidden rounded-full bg-gray-200">
-                {currentUser.avatar_url ? (
+                {currentUser?.avatar_url ? (
                   <Image
                     src={currentUser.avatar_url}
                     alt="User Avatar"
@@ -96,7 +102,7 @@ export default function HomePageContent({ currentUser }) {
           {/* Cards: Home Garden, Smart Devices */}
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* Home Garden Card */}
-            <div className="flex flex-col rounded-lg bg-white p-4 shadow">
+            <div className="flex flex-col rounded-3xl bg-white p-4 shadow">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-[#00A35B]">
                   Home Garden
@@ -123,8 +129,8 @@ export default function HomePageContent({ currentUser }) {
               </div>
             </div>
 
-            {/* Smart Devices Card */}
-            <div className="flex flex-col rounded-lg bg-white p-4 shadow">
+            {/* Smart Devices Card (Mocked) */}
+            <div className="flex flex-col rounded-3xl bg-white p-4 shadow">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-[#00A35B]">
                   Smart Devices
@@ -175,12 +181,12 @@ export default function HomePageContent({ currentUser }) {
           <div className="mt-4 space-y-3">
             {activeTab === "today" && (
               <>
-                <div className="rounded-lg bg-white p-3 shadow">
+                <div className="rounded-xl bg-white p-3 shadow">
                   <p className="text-sm">
                     Did you water <strong>“Plant under stairs”</strong> today?
                   </p>
                 </div>
-                <div className="rounded-lg bg-white p-3 shadow">
+                <div className="rounded-xl bg-white p-3 shadow">
                   <p className="text-sm">
                     Check moisture sensor readings for{" "}
                     <strong>Garden Bed #2</strong>.
@@ -189,14 +195,14 @@ export default function HomePageContent({ currentUser }) {
               </>
             )}
             {activeTab === "thisWeek" && (
-              <div className="rounded-lg bg-white p-3 shadow">
+              <div className="rounded-xl bg-white p-3 shadow">
                 <p className="text-sm">
                   Weekly tasks and scheduled watering will appear here...
                 </p>
               </div>
             )}
             {activeTab === "thisMonth" && (
-              <div className="rounded-lg bg-white p-3 shadow">
+              <div className="rounded-xl bg-white p-3 shadow">
                 <p className="text-sm">
                   Monthly tasks and fertilizing schedule will appear here...
                 </p>
@@ -209,43 +215,33 @@ export default function HomePageContent({ currentUser }) {
       {/* RIGHT SECTION: Team Selection & Garden Details */}
       <section className="w-full p-6 md:w-1/2">
         <div className="mx-auto max-w-md">
-          {/* Header: Team Select */}
+          {/* Header: Team Select & Add Team */}
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-[#00A35B]">Home Garden</h2>
-            <div className="flex items-center space-x-2">
-              <select
-                value={selectedTeam?.team_id || ""}
-                onChange={(e) => {
-                  const team = teams.find((t) => t.team_id === e.target.value);
-                  setSelectedTeam(team);
-                }}
-                className="rounded-lg border border-gray-300 p-2 focus:border-[#00A35B] focus:outline-none"
-              >
-                {teams.map((team) => (
-                  <option key={team.team_id} value={team.team_id}>
-                    {team.team_name}
-                  </option>
-                ))}
-              </select>
-              <AddTeamDialog currentUser={currentUser} />
-            </div>
+            <select
+              value={selectedTeam?.team_id || ""}
+              onChange={(e) => {
+                const team = teams.find((t) => t.team_id === e.target.value);
+                setSelectedTeam(team);
+              }}
+              className="rounded-3xl border border-gray-300 p-2 focus:border-[#00A35B] focus:outline-none"
+            >
+              {teams.map((team) => (
+                <option key={team.team_id} value={team.team_id}>
+                  {team.team_name}
+                </option>
+              ))}
+            </select>
+            <AddTeamDialog currentUser={currentUser} />
           </div>
           <p className="mt-1 text-gray-600">
             {selectedTeam ? selectedTeam.members.length : 0} Members
           </p>
 
-          {/* Optional: Garden details for the selected team */}
-          <div className="mt-4 border p-4 rounded shadow">
+          <div className="mt-4 border p-4 rounded-3xl shadow flex items-center justify-between">
             <p className="text-lg font-semibold text-[#00A35B]">
               {selectedTeam ? selectedTeam.team_name : "No team selected"}
             </p>
-            {/* Here you could display garden(s) for the team */}
-            <p className="text-sm text-gray-500">Garden details go here.</p>
-          </div>
-
-          {/* Actions: Add Garden */}
-          <div className="mt-6">
-            <AddGardenDialog />
+            <AddGardenDialog teamId={selectedTeam?.team_id} />
           </div>
         </div>
       </section>
