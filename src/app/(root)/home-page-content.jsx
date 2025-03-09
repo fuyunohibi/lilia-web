@@ -298,7 +298,7 @@ export default function HomePageContent({ currentUser }) {
               <p className="text-lg font-semibold text-[#00A35B]">
                 No garden available
               </p>
-              <AddSensorDialog />
+              <AddSensorDialog />x
             </div>
           )}
 
