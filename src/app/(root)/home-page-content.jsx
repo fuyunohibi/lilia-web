@@ -12,6 +12,7 @@ import {
   getCurrentUserTeams,
   getTeamDetails,
 } from "src/actions/teams/teams.actions";
+import ViewSensorDialog from "src/components/dialogs/view-sensor-dialog";
 
 export default function HomePageContent({ currentUser }) {
   const [loggingOut, setLoggingOut] = useState(false);
@@ -19,6 +20,7 @@ export default function HomePageContent({ currentUser }) {
   const [teams, setTeams] = useState([]);
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [teamDetails, setTeamDetails] = useState(null);
+  const [selectedGarden, setSelectedGarden] = useState(null);
 
   const plantIcons = [
     "/assets/images/plants/plant-1.png",
@@ -72,6 +74,8 @@ export default function HomePageContent({ currentUser }) {
     }
   };
 
+  console.log("team garden", teamDetails?.gardens);
+
   return (
     <div className="font-serif flex min-h-screen flex-col bg-gray-50 text-gray-800 md:flex-row">
       {/* LEFT SECTION: Dashboard */}
@@ -118,52 +122,46 @@ export default function HomePageContent({ currentUser }) {
             Welcome back to your Smart Garden!
           </p>
 
-          {/* Cards: Home Garden, Smart Devices */}
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {/* Home Garden Card */}
-            <div className="flex flex-col rounded-3xl bg-white p-4 shadow">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-[#00A35B]">
-                  {teamDetails?.gardens && teamDetails.gardens.length > 0
-                    ? teamDetails.gardens
-                        .map((item) => item.garden.garden_name)
-                        .join(", ")
-                    : "Home Garden"}
-                </h2>
+          {/* Selected Garden Card */}
+          <div className="mt-4">
+            {selectedGarden ? (
+              <div className="flex flex-col rounded-3xl p-4 shadow bg-white">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-semibold text-[#00A35B]">
+                    {selectedGarden.garden_name}
+                  </h2>
+                  <ViewSensorDialog />
+                </div>
                 <span className="text-sm text-gray-500">
                   {plantIcons.length} Plants
                 </span>
+                <div className="mt-4 flex items-center space-x-2">
+                  {plantIcons.slice(0, 4).map((icon, i) => (
+                    <div
+                      key={i}
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100"
+                    >
+                      <Image
+                        src={icon}
+                        alt={`Plant ${i}`}
+                        width={500}
+                        height={500}
+                        className="object-cover rounded-full"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="mt-4 flex items-center space-x-2">
-                {plantIcons.slice(0, 4).map((icon, i) => (
-                  <div
-                    key={i}
-                    className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100"
-                  >
-                    <Image
-                      src={icon}
-                      alt={`Plant ${i}`}
-                      width={500}
-                      height={500}
-                      className="object-cover rounded-full"
-                    />
-                  </div>
-                ))}
+            ) : (
+              <div className="my-8 mb-12 rounded-xl bg-white p-3 shadow">
+                <p className="text-sm text-gray-500 text-center">
+                  Choose a garden from the{" "}
+                  <span className="md:hidden">bottom</span>{" "}
+                  <span className="hidden md:inline-flex">right</span> panel to
+                  view its details.
+                </p>
               </div>
-            </div>
-
-            {/* Smart Devices Card (Mocked) */}
-            <div className="flex flex-col rounded-3xl bg-white p-4 shadow">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-[#00A35B]">
-                  Smart Devices
-                </h2>
-                <span className="text-sm text-gray-500">3 Active</span>
-              </div>
-              <p className="mt-4 text-sm text-gray-600">
-                Monitor humidity, soil moisture, and temperature automatically.
-              </p>
-            </div>
+            )}
           </div>
 
           {/* Tabs */}
@@ -246,7 +244,7 @@ export default function HomePageContent({ currentUser }) {
                 const team = teams.find((t) => t.team_id === e.target.value);
                 setSelectedTeam(team);
               }}
-              className="rounded-3xl border border-gray-300 p-2 focus:border-[#00A35B] focus:outline-none"
+              className="rounded-xl border border-gray-300 p-2 focus:border-[#00A35B] focus:outline-none"
             >
               {teams.map((team) => (
                 <option key={team.team_id} value={team.team_id}>
@@ -256,8 +254,10 @@ export default function HomePageContent({ currentUser }) {
             </select>
             <AddTeamDialog currentUser={currentUser} />
           </div>
-          <div className="mt-2">
-            <h3 className="text-lg font-medium text-gray-700">Members ({teamDetails?.team?.members?.length || 0})</h3>
+          <div className="mt-6">
+            <h3 className="text-lg font-medium text-gray-700">
+              Members ({teamDetails?.team?.members?.length || 0})
+            </h3>
             {teamDetails?.team?.members &&
             teamDetails.team.members.length > 0 ? (
               <ul className="mt-2 space-y-2">
@@ -283,24 +283,29 @@ export default function HomePageContent({ currentUser }) {
             )}
           </div>
 
-          {/* Garden Details for the Selected Team */}
-          {teamDetails?.gardens && teamDetails.gardens.length > 0 ? (
-            <div className="mt-4 border p-4 rounded-3xl shadow flex items-center justify-between">
-              <p className="text-lg font-semibold text-[#00A35B]">
-                {teamDetails.gardens
-                  .map((item) => item.garden.garden_name)
-                  .join(", ")}
-              </p>
-              <AddSensorDialog />
-            </div>
-          ) : (
-            <div className="mt-4 border p-4 rounded-3xl shadow flex items-center justify-between">
-              <p className="text-lg font-semibold text-[#00A35B]">
-                No garden available
-              </p>
-              <AddSensorDialog />x
-            </div>
-          )}
+          {/* Home Garden Cards List */}
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {teamDetails?.gardens &&
+              teamDetails.gardens.length > 0 &&
+              teamDetails.gardens.map((item, index) => (
+                <div
+                  key={index}
+                  onClick={() => setSelectedGarden(item.garden)}
+                  className={`flex flex-col rounded-3xl p-4 shadow cursor-pointer transition 
+                ${
+                  selectedGarden?.garden_name === item.garden.garden_name
+                    ? "bg-neutral-400 text-white"
+                    : "bg-white  text-[#00A35B]"
+                }`}
+                >
+                  <div className="flex justify-center items-center">
+                    <h2 className="text-lg font-semibold">
+                      {item.garden.garden_name}
+                    </h2>
+                  </div>
+                </div>
+              ))}
+          </div>
 
           <div className="mt-6 flex justify-center items-center">
             <AddGardenDialog teamId={selectedTeam?.team_id || ""} />

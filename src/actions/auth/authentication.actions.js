@@ -21,7 +21,6 @@ export async function emailLogin(data) {
 export async function signup(data) {
   const supabase = await createClient();
 
-  // Step 1: Create user in Supabase auth
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email: data.email,
     password: data.password,
@@ -38,7 +37,6 @@ export async function signup(data) {
     return { error: "Signup failed. Please try again." };
   }
 
-  // Step 2: Insert user profile into `users` table
   const { error: profileError } = await supabase.from("users").insert({
     user_id: userId,
     username: data.username,

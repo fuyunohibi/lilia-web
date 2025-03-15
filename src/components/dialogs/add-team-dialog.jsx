@@ -15,7 +15,7 @@ import {
   DialogClose,
 } from "src/components/ui/dialog";
 import { getAllUsers } from "src/actions/users/users.actions";
-import { addTeam } from "src/actions/teams/teams.actions";
+import { addTeamMembers } from "src/actions/teams/teams.actions";
 import { teamSchema } from "src/schemas/team.schemas";
 
 function AddTeamDialog({ currentUser }) {
@@ -78,7 +78,7 @@ function AddTeamDialog({ currentUser }) {
    }
    try {
      console.log("Add Team", data);
-     await addTeam(data);
+     await addTeamMembers(data);
      toast.success("Team added!");
      reset();
      setSearchTerm("");

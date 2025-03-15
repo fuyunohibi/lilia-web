@@ -16,17 +16,6 @@ import { gardenSchema } from "src/schemas/garden.schemas";
 import { addGarden } from "src/actions/gardens/gardens.actions";
 
 function AddGardenDialog({ teamId }) {
-  if (!teamId) {
-    return (
-      <button
-        disabled
-        className="rounded-full bg-gray-300 px-4 py-2 text-white cursor-not-allowed"
-      >
-        + Add Garden
-      </button>
-    );
-  }
-
   const [open, setOpen] = useState(false);
   const {
     register,
@@ -105,12 +94,21 @@ function AddGardenDialog({ teamId }) {
             )}
           </div>
           <DialogFooter>
-            <button
-              type="submit"
-              className="w-full rounded-full bg-[#00A35B] px-4 py-2 text-white hover:bg-[#029b56]"
-            >
-              Add Garden
-            </button>
+            {teamId ? (
+              <button
+                type="submit"
+                className="w-full rounded-full bg-[#00A35B] px-4 py-2 text-white hover:bg-[#029b56]"
+              >
+                Add Garden
+              </button>
+            ) : (
+              <button
+                disabled
+                className="rounded-full bg-gray-300 px-4 py-2 text-white cursor-not-allowed"
+              >
+                + Add Garden
+              </button>
+            )}
           </DialogFooter>
         </form>
         <DialogClose className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">

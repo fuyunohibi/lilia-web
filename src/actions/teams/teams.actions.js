@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "src/utils/supabase/server";
 
-export async function addTeam(data) {
+export async function addTeamMembers(data) {
   const supabase = await createClient();
   const { error } = await supabase.rpc("add_team", {
     p_team_name: data.teamName,
