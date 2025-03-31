@@ -16,6 +16,7 @@ import {
   getTeamGardens,
 } from "@/actions/teams/teams.actions";
 import { getGardenPlants } from "@/actions/gardens/gardens.actions";
+import Dashboard from "@/components/ui/dashboard";
 
 const HomePage = () => {
   const router = useRouter();
@@ -135,35 +136,40 @@ const HomePage = () => {
 
       {/* Plants in Selected Garden */}
       {selectedGarden && !["no-garden", "no-team"].includes(selectedGarden) && (
-        <div>
-          <h2 className="text-xl font-semibold mb-4">
-            🌱 Plants in this Garden
-          </h2>
-          {plants.length === 0 ? (
-            <p className="text-neutral-500 italic">
-              No plants found in this garden.
-            </p>
-          ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {plants.map((plant) => (
-                <div
-                  key={plant.plant_id}
-                  className="rounded-xl border p-4 dark:border-neutral-700 bg-white dark:bg-neutral-900"
-                >
-                  <h3 className="text-lg font-medium text-neutral-800 dark:text-white">
-                    {plant.plant_name}
-                  </h3>
-                  <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                    {plant.plant_species}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <>
+          <div>
+            <h2 className="text-xl font-semibold mb-4">
+              🌱 Plants in this Garden
+            </h2>
+            {plants.length === 0 ? (
+              <p className="text-neutral-500 italic">
+                No plants found in this garden.
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {plants.map((plant) => (
+                  <div
+                    key={plant.plant_id}
+                    className="rounded-xl border p-4 dark:border-neutral-700 bg-white dark:bg-neutral-900"
+                  >
+                    <h3 className="text-lg font-medium text-neutral-800 dark:text-white">
+                      {plant.plant_name}
+                    </h3>
+                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                      {plant.plant_species}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <Dashboard />
+        </>
       )}
     </PageWrapper>
   );
 };
 
 export default HomePage;
+
+
