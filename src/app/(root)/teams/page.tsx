@@ -13,8 +13,10 @@ import { cn } from "@/lib/utils";
 import PageWrapper from "@/components/layout.tsx/page-content";
 import { UserTooltip } from "@/components/ui/user-tooltip";
 import AddTeamDialog from "@/components/teams/add-team-dialog";
+import { useRouter } from "next/navigation";
 
 const TeamPage = () => {
+  const router = useRouter();
   const [teams, setTeams] = useState<any[]>([]);
   const [expandedTeam, setExpandedTeam] = useState<string | null>(null);
   const [teamMembers, setTeamMembers] = useState<{ [key: string]: any[] }>({});
@@ -175,17 +177,18 @@ const TeamPage = () => {
                       ) : (
                         <div className="flex flex-col gap-3">
                           {gardens.map((g: any, idx: number) => (
-                            <div
+                            <button 
                               key={g.garden_id ?? idx}
-                              className="rounded-lg border border-neutral-200 dark:border-neutral-700 p-3 bg-neutral-50 dark:bg-neutral-900"
+                              onClick={() => router.push("/gardens")}
+                              className="cursor-pointer rounded-lg border border-neutral-200 dark:border-neutral-700 p-3 bg-green-600 dark:bg-neutral-900"
                             >
-                              <h3 className="text-sm font-semibold text-neutral-800 dark:text-white">
+                              <h3 className="text-sm font-semibold text-white">
                                 {g.garden_name}
                               </h3>
-                              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                              <p className="text-xs text-neutral-200">
                                 {g.garden_location}
                               </p>
-                            </div>
+                            </button>
                           ))}
                         </div>
                       )}

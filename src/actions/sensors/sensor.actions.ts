@@ -26,15 +26,16 @@ export async function addSensor({
   }
 }
 
-export async function getGardenSensors(garden_id: string) {
-  const supabase = await createClient();
+export const getGardenSensors = async (gardenId: string) => {
+  console.log("Calling getGardenSensors with:", gardenId);
+
+   const supabase = await createClient();
   const { data, error } = await supabase.rpc("get_garden_sensors", {
-    p_garden_id: garden_id,
+    p_garden_id: gardenId,
   });
 
-  if (error) {
-    throw new Error(`Error fetching garden sensors: ${error.message}`);
-  }
+  console.log("RPC data:", data);
+  console.log("RPC error:", error);
 
-  return data;
-}
+  return { data, error };
+};
