@@ -47,8 +47,8 @@ function AddPlantDialog({ gardenId }: { gardenId: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="rounded-full bg-[#00A35B] px-4 py-2 text-white hover:bg-[#029b56]">
-          + Add Plant
+        <button className="rounded-full bg-green-600 px-4 py-2 text-white hover:bg-[#029b56]">
+          +
         </button>
       </DialogTrigger>
 

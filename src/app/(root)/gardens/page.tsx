@@ -7,6 +7,7 @@ import {
 } from "@/actions/teams/teams.actions";
 import { getCurrentUser } from "@/actions/users/users.actions";
 import { getGardenPlants } from "@/actions/gardens/gardens.actions";
+import { getGardenSensors } from "@/actions/sensors/sensor.actions";
 import {
   Select,
   SelectContent,
@@ -20,6 +21,7 @@ import PageWrapper from "@/components/layout.tsx/page-content";
 import { cn } from "@/lib/utils";
 import AddGardenDialog from "@/components/gardens/add-garden-dialog";
 import AddPlantDialog from "@/components/plants/add-plant-dialog";
+import AddSensorDialog from "@/components/sensors/add-sensor-dialog";
 import { PlantDetailsDialog } from "@/components/plants/plant-details-dialog";
 import Image from "next/image";
 
@@ -28,6 +30,9 @@ const GardenPage = () => {
   const [selectedTeamId, setSelectedTeamId] = useState<string>("");
   const [gardens, setGardens] = useState<any[]>([]);
   const [gardenPlantCounts, setGardenPlantCounts] = useState<{
+    [key: string]: number;
+  }>({});
+  const [gardenSensorCounts, setGardenSensorCounts] = useState<{
     [key: string]: number;
   }>({});
   const [gardenPlants, setGardenPlants] = useState<{ [key: string]: any[] }>(
@@ -53,24 +58,34 @@ const GardenPage = () => {
   }, []);
 
   useEffect(() => {
-    const loadGardensAndPlantCounts = async () => {
+    const loadData = async () => {
       if (!selectedTeamId) return;
       const { data } = await getTeamGardens(selectedTeamId);
       setGardens(data || []);
 
-      const countPromises = (data || []).map((garden: any) =>
-        getGardenPlants(garden.garden_id).then((res) => [
-          garden.garden_id,
-          res.data?.length || 0,
-        ])
+      const plantCounts = await Promise.all(
+        (data || []).map((garden: any) =>
+          getGardenPlants(garden.garden_id).then((res) => [
+            garden.garden_id,
+            res.data?.length || 0,
+          ])
+        )
       );
 
-      const results = await Promise.all(countPromises);
-      const counts: { [key: string]: number } = Object.fromEntries(results);
-      setGardenPlantCounts(counts);
+      const sensorCounts = await Promise.all(
+        (data || []).map((garden: any) =>
+          getGardenSensors(garden.garden_id).then((res) => [
+            garden.garden_id,
+            res.data?.length || 0,
+          ])
+        )
+      );
+
+      setGardenPlantCounts(Object.fromEntries(plantCounts));
+      setGardenSensorCounts(Object.fromEntries(sensorCounts));
     };
 
-    loadGardensAndPlantCounts();
+    loadData();
   }, [selectedTeamId]);
 
   const toggleExpand = async (gardenId: string) => {
@@ -95,8 +110,8 @@ const GardenPage = () => {
         transition={{ duration: 0.4, ease: "easeInOut" }}
         className="flex items-center justify-between mb-6"
       >
-        <h1 className="text-2xl font-semibold text-neutral-800 dark:text-neutral-100">
-          My Gardens
+        <h1 className="text-3xl font-bold text-neutral-800 dark:text-white">
+          🌿 My Gardens
         </h1>
 
         <div className="flex items-center gap-4">
@@ -130,7 +145,7 @@ const GardenPage = () => {
           This team has no gardens yet.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {gardens.map((garden) => {
             const isExpanded = expandedGarden === garden.garden_id;
             const plants = gardenPlants[garden.garden_id] ?? [];
@@ -143,26 +158,37 @@ const GardenPage = () => {
                   "relative rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-700 dark:bg-neutral-800 hover:shadow-md transition"
                 )}
               >
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-200 dark:bg-neutral-700">
-                    <IconPlant className="h-6 w-6 text-black dark:text-white" />
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-neutral-200 dark:bg-neutral-700">
+                      <IconPlant className="h-6 w-6 text-black dark:text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-semibold text-neutral-800 dark:text-white">
+                        {garden.garden_name}
+                      </h2>
+                      <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                        {garden.garden_location}
+                      </p>
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        <span className="text-sm bg-green-600 text-white px-3 py-1 rounded-full">
+                          🌱 {gardenPlantCounts[garden.garden_id] || 0} plant
+                          {gardenPlantCounts[garden.garden_id] === 1 ? "" : "s"}
+                        </span>
+                        <span className="text-sm bg-gray-600 text-white px-3 py-1 rounded-full">
+                          🔧 {gardenSensorCounts[garden.garden_id] || 0} sensor
+                          {gardenSensorCounts[garden.garden_id] === 1
+                            ? ""
+                            : "s"}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-lg font-medium text-neutral-800 dark:text-white">
-                      {garden.garden_name}
-                    </h2>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                      {garden.garden_location}
-                    </p>
-                    <p className="text-sm text-green-600 mt-1">
-                      🌱 {gardenPlantCounts[garden.garden_id] || 0} plant
-                      {gardenPlantCounts[garden.garden_id] === 1 ? "" : "s"}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="absolute top-6 right-6">
-                  <AddPlantDialog gardenId={garden.garden_id} />
+                  <div className="flex gap-2">
+                    <AddPlantDialog gardenId={garden.garden_id} />
+                    <AddSensorDialog gardenId={garden.garden_id} />
+                  </div>
                 </div>
 
                 <button
@@ -197,7 +223,7 @@ const GardenPage = () => {
                           {plants.map((plant: any) => (
                             <div
                               key={plant.plant_id}
-                              className=" rounded-lg p-3 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
+                              className="rounded-lg p-3 border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800"
                             >
                               <div className="flex justify-between items-center">
                                 <h3 className="text-sm font-semibold text-neutral-800 dark:text-white">

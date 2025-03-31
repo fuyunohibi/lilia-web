@@ -44,8 +44,8 @@ function AddSensorDialog({ gardenId }: { gardenId: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="rounded-full bg-[#00A35B] px-4 py-2 text-white hover:bg-[#029b56]">
-          + Add Sensor
+        <button className="rounded-full bg-neutral-600 flex justify-center items-center px-4 text-white hover:hover:bg-neutral-500">
+          +
         </button>
       </DialogTrigger>
       <DialogContent>
