@@ -22,16 +22,3 @@ export async function addGarden(data) {
   return { success: true };
 }
 
-export async function getGardenPlants(gardenId) {
-  const supabase = await createClient();
-  const { data, error } = await supabase.rpc("get_garden_plants", {
-    p_garden_id: gardenId,
-  });
-
-  if (error) {
-    console.error("Error fetching garden plants:", error.message);
-    return { error: error.message };
-  }
-
-  return { data };
-}

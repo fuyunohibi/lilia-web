@@ -6,7 +6,6 @@ import {
   getTeamGardens,
 } from "@/actions/teams/teams.actions";
 import { getCurrentUser } from "@/actions/users/users.actions";
-import { getGardenPlants } from "@/actions/gardens/gardens.actions";
 import { getGardenSensors } from "@/actions/sensors/sensor.actions";
 import {
   Select,
@@ -24,6 +23,7 @@ import AddPlantDialog from "@/components/plants/add-plant-dialog";
 import AddSensorDialog from "@/components/sensors/add-sensor-dialog";
 import { PlantDetailsDialog } from "@/components/plants/plant-details-dialog";
 import Image from "next/image";
+import { getPlants } from "@/actions/plants/plants.actions";
 
 const GardenPage = () => {
   const [teams, setTeams] = useState<any[]>([]);
@@ -65,7 +65,7 @@ const GardenPage = () => {
 
       const plantCounts = await Promise.all(
         (data || []).map((garden: any) =>
-          getGardenPlants(garden.garden_id).then((res) => [
+          getPlants(garden.garden_id).then((res) => [
             garden.garden_id,
             res.data?.length || 0,
           ])
@@ -96,7 +96,7 @@ const GardenPage = () => {
     }
 
     if (!gardenPlants[gardenId]) {
-      const { data } = await getGardenPlants(gardenId);
+      const { data } = await getPlants(gardenId);
       setGardenPlants((prev) => ({ ...prev, [gardenId]: data || [] }));
     }
 
