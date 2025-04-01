@@ -92,9 +92,14 @@ const AnalyticsPage = () => {
               <CardDescription>Hourly trend (last 24 hours)</CardDescription>
             </CardHeader>
 
-            <CardContent className="h-42">
+            <CardContent className="!p-4">
               <ChartContainer config={{ [key]: config }}>
-                <AreaChart data={data} margin={{ left: 12, right: 12 }}>
+                <AreaChart
+                  data={data}
+                  width={undefined}
+                  height={200} 
+                  margin={{ left: 12, right: 12 }}
+                >
                   <CartesianGrid vertical={false} />
                   <XAxis
                     dataKey="time"

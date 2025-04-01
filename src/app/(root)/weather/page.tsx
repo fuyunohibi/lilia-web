@@ -11,77 +11,31 @@ import {
   Cloud,
   Sunrise,
   Sunset,
+  Eye,
+  Mountain,
+  Waves,
+  MapPin,
 } from "lucide-react";
 import dayjs from "dayjs";
 import PageWrapper from "@/components/layout.tsx/page-content";
 
-const mockWeatherData = {
-  name: "Bangkok",
-  coord: {
-    lon: 100.5167,
-    lat: 13.75,
-  },
-  weather: [
-    {
-      id: 501,
-      main: "Rain",
-      description: "moderate rain",
-      icon: "10d",
-    },
-  ],
-  main: {
-    temp: 284.2,
-    feels_like: 282.93,
-    temp_min: 283.06,
-    temp_max: 286.82,
-    pressure: 1021,
-    humidity: 60,
-    sea_level: 1021,
-    grnd_level: 910,
-  },
-  wind: {
-    speed: 4.09,
-    deg: 121,
-    gust: 3.47,
-  },
-  rain: {
-    "1h": 2.73,
-  },
-  clouds: {
-    all: 83,
-  },
-  sys: {
-    country: "TH",
-    sunrise: 1726636384,
-    sunset: 1726680975,
-  },
-  timezone: 25200,
-};
-
 const WeatherPage = () => {
-  const [weather, setWeather] = useState<typeof mockWeatherData | null>(null);
+  const [weather, setWeather] = useState<any>(null);
 
-  // TODO: Replace with real fetch when API key is active in 1 hour
-  // const fetchWeather = async () => {
-  //   try {
-  //     const response = await fetch(
-  //       `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}`
-  //     );
-  //     const data = await response.json();
-  //     setWeather(data);
-  //   } catch (error) {
-  //     console.error("Error fetching weather:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchWeather();
-  // }, []);
+  const fetchWeather = async () => {
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=13.7563&lon=100.5018&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}`
+      );
+      const data = await response.json();
+      setWeather(data);
+    } catch (error) {
+      console.error("Error fetching weather:", error);
+    }
+  };
 
   useEffect(() => {
-    setWeather(mockWeatherData);
+    fetchWeather();
   }, []);
 
   const convertKtoC = (k: number) => Math.round(k - 273.15);
@@ -140,7 +94,7 @@ const WeatherPage = () => {
             <p className="text-5xl font-bold mt-2">
               {convertKtoC(weather.main.temp)}°C
             </p>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 text-sm capitalize">
               {weather.weather[0].description}
             </p>
             <p className="text-xs text-gray-400">
@@ -154,30 +108,61 @@ const WeatherPage = () => {
               <span>{weather.main.humidity}%</span>
               <span className="text-xs text-gray-400">Humidity</span>
             </div>
+
             <div className="flex flex-col items-center">
               <Wind className="w-5 h-5 mb-1" />
               <span>{weather.wind.speed} m/s</span>
               <span className="text-xs text-gray-400">Wind</span>
             </div>
+
             <div className="flex flex-col items-center">
               <Sunrise className="w-5 h-5 mb-1" />
               <span>{dayjs.unix(weather.sys.sunrise).format("HH:mm")}</span>
               <span className="text-xs text-gray-400">Sunrise</span>
             </div>
+
             <div className="flex flex-col items-center">
               <Sunset className="w-5 h-5 mb-1" />
               <span>{dayjs.unix(weather.sys.sunset).format("HH:mm")}</span>
               <span className="text-xs text-gray-400">Sunset</span>
             </div>
+
             <div className="flex flex-col items-center">
               <Cloud className="w-5 h-5 mb-1" />
               <span>{weather.clouds.all}%</span>
               <span className="text-xs text-gray-400">Clouds</span>
             </div>
+
             <div className="flex flex-col items-center">
               <CloudRain className="w-5 h-5 mb-1" />
-              <span>{weather.rain["1h"]} mm</span>
+              <span>{weather.rain?.["1h"] || 0} mm</span>
               <span className="text-xs text-gray-400">Rain (1h)</span>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <Waves className="w-5 h-5 mb-1" />
+              <span>{weather.main.sea_level || "—"} hPa</span>
+              <span className="text-xs text-gray-400">Sea Level</span>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <Mountain className="w-5 h-5 mb-1" />
+              <span>{weather.main.grnd_level || "—"} hPa</span>
+              <span className="text-xs text-gray-400">Ground Level</span>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <Eye className="w-5 h-5 mb-1" />
+              <span>{weather.visibility / 1000} km</span>
+              <span className="text-xs text-gray-400">Visibility</span>
+            </div>
+
+            <div className="flex flex-col items-center col-span-3">
+              <MapPin className="w-5 h-5 mb-1" />
+              <span>
+                Lat: {weather.coord.lat}, Lon: {weather.coord.lon}
+              </span>
+              <span className="text-xs text-gray-400">Coordinates</span>
             </div>
           </div>
         </div>
