@@ -101,8 +101,8 @@ const HomePage = () => {
 
   return (
     <PageWrapper>
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div>
+      <div className="flex flex-col md:flex-row md:items-end gap-4 mb-6">
+        <div className="w-full md:w-64">
           <label className="mb-1 block text-sm font-medium">Select Team</label>
           <Select
             value={selectedTeam}
@@ -114,7 +114,7 @@ const HomePage = () => {
               }
             }}
           >
-            <SelectTrigger className="w-64">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Choose a team" />
             </SelectTrigger>
             <SelectContent>
@@ -134,7 +134,7 @@ const HomePage = () => {
         </div>
 
         {selectedTeam && (
-          <div>
+          <div className="w-full md:w-64">
             <label className="mb-1 block text-sm font-medium">
               Select Garden
             </label>
@@ -148,7 +148,7 @@ const HomePage = () => {
                 }
               }}
             >
-              <SelectTrigger className="w-64">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Choose a garden" />
               </SelectTrigger>
               <SelectContent>
@@ -180,7 +180,7 @@ const HomePage = () => {
                 No plants found in this garden.
               </p>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {plants.map((plant) => (
                   <div
                     key={plant.plant_id}
