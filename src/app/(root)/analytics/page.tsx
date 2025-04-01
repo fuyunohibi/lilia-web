@@ -19,20 +19,6 @@ import {
 } from "@/components/charts/chart";
 import PageWrapper from "@/components/layout.tsx/page-content";
 
-const generateMockData = () => {
-  const now = new Date();
-  return Array.from({ length: 24 }, (_, i) => {
-    const hour = new Date(now.getTime() - (23 - i) * 60 * 60 * 1000);
-    return {
-      time: `${hour.getHours()}:00`,
-      vpd: +(Math.random() * 2).toFixed(2),
-      dli: +(Math.random() * 1).toFixed(3),
-      soil_water_deficit_estimation: +(Math.random() * 3).toFixed(2),
-      plant_heat_stress: +(1 + Math.random() * 0.5).toFixed(3),
-    };
-  });
-};
-
 const chartConfig: ChartConfig = {
   vpd: { label: "VPD", color: "hsl(var(--chart-1))" },
   dli: { label: "DLI", color: "hsl(var(--chart-2))" },
@@ -77,7 +63,11 @@ const AnalyticsPage = () => {
       }
     };
   
-    fetchData();
+    // fetchData(); // first fetch immediately
+  //fetchData every 60 minutes
+    const interval = setInterval(fetchData, 60 * 60 * 1000); // every hour
+    fetchData(); // also fetch immediately
+    return () => clearInterval(interval); // cleanup on unmount
   }, []);
   
 
