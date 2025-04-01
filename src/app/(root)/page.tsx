@@ -15,9 +15,9 @@ import {
   getCurrentUserTeams,
   getTeamGardens,
 } from "@/actions/teams/teams.actions";
-import { getGardenPlants } from "@/actions/gardens/gardens.actions";
 import Dashboard from "@/components/ui/dashboard";
 import Image from "next/image";
+import { getPlants } from "@/actions/plants/plants.actions";
 
 
 interface Team {
@@ -94,7 +94,7 @@ const HomePage = () => {
   useEffect(() => {
     const loadPlants = async () => {
       if (!selectedGarden) return;
-      const { data } = await getGardenPlants(selectedGarden);
+      const { data } = await getPlants(selectedGarden);
       setPlants(data || []);
     };
 
@@ -171,12 +171,21 @@ const HomePage = () => {
         )}
 
         {selectedGarden && (
-          <div className="mt-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             <button
               onClick={() => router.push(`/gardens/${selectedGarden}/live`)}
               className="inline-flex items-center gap-2 rounded-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm font-medium shadow transition"
             >
               🎥 View Live Cam
+            </button>
+
+            <button
+              onClick={() =>
+                router.push(`/gardens/${selectedGarden}/watering-schedule`)
+              }
+              className="inline-flex items-center gap-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm font-medium shadow transition"
+            >
+              💧 See Watering Schedule
             </button>
           </div>
         )}

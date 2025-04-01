@@ -145,7 +145,7 @@ const TeamPage = () => {
                     onClick={() => toggleExpand(team.team_id)}
                     className="group flex items-center justify-between mt-6 text-sm text-neutral-700 dark:text-neutral-300 hover:underline w-full"
                   >
-                    <span>View Details</span>
+                    <span>View Gardens</span>
                     <IconChevronDown
                       className={cn(
                         "h-5 w-5 transform transition-transform duration-200",
