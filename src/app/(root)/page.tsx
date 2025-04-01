@@ -17,6 +17,8 @@ import {
 } from "@/actions/teams/teams.actions";
 import { getGardenPlants } from "@/actions/gardens/gardens.actions";
 import Dashboard from "@/components/ui/dashboard";
+import Image from "next/image";
+
 
 interface Team {
   team_id: string;
@@ -32,7 +34,7 @@ interface Garden {
 interface Plant {
   plant_id: string;
   plant_name: string;
-  plant_species: string;
+  plant_image_url: string;
 }
 
 const HomePage = () => {
@@ -167,6 +169,17 @@ const HomePage = () => {
             </Select>
           </div>
         )}
+
+        {selectedGarden && (
+          <div className="mt-2">
+            <button
+              onClick={() => router.push(`/gardens/${selectedGarden}/live`)}
+              className="inline-flex items-center gap-2 rounded-full bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-sm font-medium shadow transition"
+            >
+              🎥 View Live Cam
+            </button>
+          </div>
+        )}
       </div>
 
       {selectedGarden && !["no-garden", "no-team"].includes(selectedGarden) && (
@@ -180,18 +193,27 @@ const HomePage = () => {
                 No plants found in this garden.
               </p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {plants.map((plant) => (
                   <div
                     key={plant.plant_id}
-                    className="rounded-xl border p-4 dark:border-neutral-700 bg-white dark:bg-neutral-900"
+                    className="rounded-2xl bg-white/60 dark:bg-neutral-800/40 backdrop-blur-md shadow-sm hover:shadow-md transition-all duration-300 hover:scale-105"
                   >
-                    <h3 className="text-lg font-medium text-neutral-800 dark:text-white">
-                      {plant.plant_name}
-                    </h3>
-                    <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                      {plant.plant_species}
-                    </p>
+                    {plant.plant_image_url && (
+                      <div className="relative w-full aspect-[4/3] rounded-t-2xl overflow-hidden">
+                        <Image
+                          src={plant.plant_image_url}
+                          alt={plant.plant_name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    )}
+                    <div className="px-3 py-2">
+                      <h3 className="text-sm font-semibold text-neutral-800 dark:text-white truncate">
+                        {plant.plant_name}
+                      </h3>
+                    </div>
                   </div>
                 ))}
               </div>
