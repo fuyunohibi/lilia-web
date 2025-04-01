@@ -61,8 +61,26 @@ const mockWeatherData = {
 const WeatherPage = () => {
   const [weather, setWeather] = useState<typeof mockWeatherData | null>(null);
 
+  // TODO: Replace with real fetch when API key is active in 1 hour
+  // const fetchWeather = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${process.env.NEXT_PUBLIC_WEATHER_API_KEY}`
+  //     );
+  //     const data = await response.json();
+  //     setWeather(data);
+  //   } catch (error) {
+  //     console.error("Error fetching weather:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchWeather();
+  // }, []);
+
   useEffect(() => {
-    // TODO: Replace with real fetch when API key is active in 1 hour
     setWeather(mockWeatherData);
   }, []);
 
@@ -101,67 +119,69 @@ const WeatherPage = () => {
   };
 
   return (
-    <PageWrapper className={`flex items-center justify-center rounded-xl p-6 bg-gradient-to-br ${getWeatherBackground(
-          weather?.weather[0].main || ""
-        )}`}>
-        {weather && (
-          <div className="bg-white rounded-3xl shadow-lg w-full max-w-sm p-6 text-center dark:bg-neutral-800">
-            <div className="flex flex-col items-center gap-1">
-              <p className="text-sm text-gray-500">
-                {weather.name}, {weather.sys.country}
-              </p>
-              <p className="text-xs text-gray-400">
-                {dayjs().format("dddd, D MMMM")}
-              </p>
-            </div>
+    <PageWrapper
+      className={`flex items-center justify-center rounded-xl p-6 bg-gradient-to-br ${getWeatherBackground(
+        weather?.weather[0].main || ""
+      )}`}
+    >
+      {weather && (
+        <div className="bg-white rounded-3xl shadow-lg w-full max-w-sm p-6 text-center dark:bg-neutral-800">
+          <div className="flex flex-col items-center gap-1">
+            <p className="text-sm text-gray-500">
+              {weather.name}, {weather.sys.country}
+            </p>
+            <p className="text-xs text-gray-400">
+              {dayjs().format("dddd, D MMMM")}
+            </p>
+          </div>
 
-            <div className="my-6">
-              {renderWeatherIcon(weather.weather[0].main)}
-              <p className="text-5xl font-bold mt-2">
-                {convertKtoC(weather.main.temp)}°C
-              </p>
-              <p className="text-gray-500 text-sm">
-                {weather.weather[0].description}
-              </p>
-              <p className="text-xs text-gray-400">
-                Feels like {convertKtoC(weather.main.feels_like)}°C
-              </p>
-            </div>
+          <div className="my-6">
+            {renderWeatherIcon(weather.weather[0].main)}
+            <p className="text-5xl font-bold mt-2">
+              {convertKtoC(weather.main.temp)}°C
+            </p>
+            <p className="text-gray-500 text-sm">
+              {weather.weather[0].description}
+            </p>
+            <p className="text-xs text-gray-400">
+              Feels like {convertKtoC(weather.main.feels_like)}°C
+            </p>
+          </div>
 
-            <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
-              <div className="flex flex-col items-center">
-                <Droplets className="w-5 h-5 mb-1" />
-                <span>{weather.main.humidity}%</span>
-                <span className="text-xs text-gray-400">Humidity</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <Wind className="w-5 h-5 mb-1" />
-                <span>{weather.wind.speed} m/s</span>
-                <span className="text-xs text-gray-400">Wind</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <Sunrise className="w-5 h-5 mb-1" />
-                <span>{dayjs.unix(weather.sys.sunrise).format("HH:mm")}</span>
-                <span className="text-xs text-gray-400">Sunrise</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <Sunset className="w-5 h-5 mb-1" />
-                <span>{dayjs.unix(weather.sys.sunset).format("HH:mm")}</span>
-                <span className="text-xs text-gray-400">Sunset</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <Cloud className="w-5 h-5 mb-1" />
-                <span>{weather.clouds.all}%</span>
-                <span className="text-xs text-gray-400">Clouds</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <CloudRain className="w-5 h-5 mb-1" />
-                <span>{weather.rain["1h"]} mm</span>
-                <span className="text-xs text-gray-400">Rain (1h)</span>
-              </div>
+          <div className="grid grid-cols-3 gap-4 text-sm text-gray-600">
+            <div className="flex flex-col items-center">
+              <Droplets className="w-5 h-5 mb-1" />
+              <span>{weather.main.humidity}%</span>
+              <span className="text-xs text-gray-400">Humidity</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <Wind className="w-5 h-5 mb-1" />
+              <span>{weather.wind.speed} m/s</span>
+              <span className="text-xs text-gray-400">Wind</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <Sunrise className="w-5 h-5 mb-1" />
+              <span>{dayjs.unix(weather.sys.sunrise).format("HH:mm")}</span>
+              <span className="text-xs text-gray-400">Sunrise</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <Sunset className="w-5 h-5 mb-1" />
+              <span>{dayjs.unix(weather.sys.sunset).format("HH:mm")}</span>
+              <span className="text-xs text-gray-400">Sunset</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <Cloud className="w-5 h-5 mb-1" />
+              <span>{weather.clouds.all}%</span>
+              <span className="text-xs text-gray-400">Clouds</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <CloudRain className="w-5 h-5 mb-1" />
+              <span>{weather.rain["1h"]} mm</span>
+              <span className="text-xs text-gray-400">Rain (1h)</span>
             </div>
           </div>
-        )}
+        </div>
+      )}
     </PageWrapper>
   );
 };
