@@ -10,6 +10,7 @@ import {
   IconShovel,
   IconHome,
   IconDoorEnter,
+  IconBrandGoogleAnalytics,
 } from "@tabler/icons-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -35,6 +36,13 @@ export default function ClientLayoutWrapper({
       href: "/",
       icon: (
         <IconHome className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+    },
+    {
+      label: "Analytics",
+      href: "/analytics",
+      icon: (
+        <IconBrandGoogleAnalytics className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
     {
@@ -68,12 +76,10 @@ export default function ClientLayoutWrapper({
     {
       label: currentUser ? "Logout" : "Login",
       href: currentUser ? "/auth/logout" : "/auth/login",
-      icon: (
-        currentUser ? (
+      icon: currentUser ? (
         <IconDoorExit className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
-        ) : (
+      ) : (
         <IconDoorEnter className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
-        )
       ),
     },
   ];
