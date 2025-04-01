@@ -50,8 +50,36 @@ const AnalyticsPage = () => {
   const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
-    setData(generateMockData());
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/analytics");
+        const json = await res.json();
+  
+        if (!Array.isArray(json.data)) {
+          console.error("Unexpected data format:", json);
+          return;
+        }
+  
+        const formatted = json.data.map((item: any) => ({
+          time: new Date(item.timestamp).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          vpd: item.vpd,
+          dli: item.dli,
+          soil_water_deficit_estimation: item.soil_water_deficit_estimation,
+          plant_heat_stress: item.plant_heat_stress,
+        }));
+  
+        setData(formatted);
+      } catch (err) {
+        console.error("Failed to fetch sensor data:", err);
+      }
+    };
+  
+    fetchData();
   }, []);
+  
 
   return (
     <PageWrapper>

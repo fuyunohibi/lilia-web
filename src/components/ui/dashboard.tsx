@@ -27,60 +27,29 @@ const Dashboard = () => {
     }
   };
 
+  const fetchSensorData = async () => {
+    try {
+      const res = await fetch("/api/sensor");
+      const json = await res.json();
+      const latest = json.data;
+      setSensorData(latest);
+
+      // Keep only last 10 history points
+      setMoistureHistory((prev) => {
+        const updated = [...prev, latest];
+        return updated.length > 10 ? updated.slice(updated.length - 10) : updated;
+      });
+    } catch (err) {
+      console.error("❌ Failed to fetch sensor data:", err);
+    }
+  };
+
   useEffect(() => {
     fetchActuatorState();
+    fetchSensorData();
 
-    // MOCK SENSOR DATA
-    const history = [
-      {
-        soil_moisture1: 41,
-        soil_moisture2: 40,
-        liquid_detected: true,
-        temperature: 24.7,
-        humidity: 71.2,
-        light: 51.67,
-        timestamp: "2025-04-01T03:06:26.626Z",
-      },
-      {
-        soil_moisture1: 42,
-        soil_moisture2: 41,
-        liquid_detected: true,
-        temperature: 24.7,
-        humidity: 71.1,
-        light: 50.83,
-        timestamp: "2025-04-01T03:06:29.572Z",
-      },
-      {
-        soil_moisture1: 41,
-        soil_moisture2: 39,
-        liquid_detected: true,
-        temperature: 24.7,
-        humidity: 71.1,
-        light: 50.83,
-        timestamp: "2025-04-01T03:06:32.643Z",
-      },
-      {
-        soil_moisture1: 41,
-        soil_moisture2: 39,
-        liquid_detected: true,
-        temperature: 24.7,
-        humidity: 71.0,
-        light: 50.83,
-        timestamp: "2025-04-01T03:06:35.615Z",
-      },
-      {
-        soil_moisture1: 41,
-        soil_moisture2: 40,
-        liquid_detected: true,
-        temperature: 24.7,
-        humidity: 70.9,
-        light: 50.83,
-        timestamp: "2025-04-01T03:06:38.685Z",
-      },
-    ];
-
-    setSensorData(history[history.length - 1]); // latest for display
-    setMoistureHistory(history); // full history for line chart
+    const interval = setInterval(fetchSensorData, 5000); // auto refresh every 5s
+    return () => clearInterval(interval);
   }, []);
 
   const toggleActuator = async (type: "pump" | "fan", state: boolean) => {
