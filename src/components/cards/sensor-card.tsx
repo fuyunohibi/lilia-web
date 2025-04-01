@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
 import { Switch } from "../ui/switch";
 
@@ -8,7 +8,8 @@ interface ActuatorCardProps {
   title: string;
   description: string;
   backgroundImage: string;
-  isActive: boolean; // ON, OFF
+  isActive: boolean;
+  onToggle: (state: boolean) => void;
 }
 
 const ActuatorCard = ({
@@ -16,9 +17,8 @@ const ActuatorCard = ({
   description,
   backgroundImage,
   isActive,
+  onToggle,
 }: ActuatorCardProps) => {
-  const [active, setActive] = useState(isActive);
-
   return (
     <div className="relative h-full w-full rounded-3xl bg-gray-100 p-5 flex flex-col justify-between shadow-lg">
       {/* Background Image */}
@@ -32,12 +32,12 @@ const ActuatorCard = ({
         initial={{ opacity: 0 }}
         animate={{
           opacity: 1,
-          filter: active ? "brightness(1)" : "brightness(0.5)",
+          filter: isActive ? "brightness(1)" : "brightness(0.5)",
         }}
         transition={{ duration: 0.8, ease: "easeInOut" }}
       />
 
-      {/* Light Switch */}
+      {/* Switch */}
       <motion.div
         className="absolute top-5 right-5 z-20"
         initial={{ opacity: 0, y: -20 }}
@@ -45,15 +45,15 @@ const ActuatorCard = ({
         transition={{ delay: 0.2, duration: 0.5 }}
       >
         <Switch
-          checked={active}
-          onCheckedChange={setActive} 
+          checked={isActive}
+          onCheckedChange={onToggle}
           className={`${
-            active ? "bg-green-500" : "bg-gray-700"
+            isActive ? "bg-green-500" : "bg-gray-700"
           } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
         />
       </motion.div>
 
-      {/* TITLE & DESCRIPTION */}
+      {/* Title & Description */}
       <motion.div
         className="relative z-10"
         initial={{ opacity: 0, y: 20 }}

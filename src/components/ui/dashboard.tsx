@@ -1,6 +1,47 @@
+import { useState, useEffect } from "react";
 import ActuatorCard from "../cards/sensor-card";
 
+
 const Dashboard = () => {
+  const [pumpActive, setPumpActive] = useState(false);
+  const [fanActive, setFanActive] = useState(false);
+
+  const fetchActuatorState = async () => {
+    try {
+      const [pumpRes, fanRes] = await Promise.all([
+        fetch("/api/actuator/pump"),
+        fetch("/api/actuator/fan"),
+      ]);
+      const pumpData = await pumpRes.json();
+      const fanData = await fanRes.json();
+
+      if (pumpData?.state) setPumpActive(pumpData.state === "on");
+      if (fanData?.state) setFanActive(fanData.state === "on");
+    } catch (err) {
+      console.error("❌ Failed to fetch actuator state:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchActuatorState();
+  }, []);
+
+  const toggleActuator = async (type: "pump" | "fan", state: boolean) => {
+    if (type === "pump") setPumpActive(state);
+    if (type === "fan") setFanActive(state);
+
+    try {
+      await fetch(`/api/actuator/${type}`, {
+        method: "POST",
+        body: JSON.stringify({ command: state ? "on" : "off" }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (err) {
+      console.error(`❌ Failed to toggle ${type}:`, err);
+    }
+  };
   // const [selectedRoom, setSelectedRoom] = useState<
   //   "Home" | "Living Room" | "Bedroom"
   // >("Home");
@@ -48,19 +89,21 @@ const Dashboard = () => {
           />
         </div> */}
 
-        {/* BOTTOM ROW */}
-        <div className="flex gap-3 h-[40%]">
+          {/* BOTTOM ROW */}
+          <div className="flex gap-3 h-[40%]">
           <ActuatorCard
             title="Water Pump"
             description="My Water Pump"
             backgroundImage="https://tomahawk-power.com/cdn/shop/articles/wide_angle_1024x.jpg?v=1623716961"
-            isActive={true}
+            isActive={pumpActive}
+            onToggle={(state) => toggleActuator("pump", state)}
           />
           <ActuatorCard
             title="Fan"
             description="My Fan"
             backgroundImage="https://m.media-amazon.com/images/I/810r2WWqGoL._AC_UF894,1000_QL80_.jpg"
-            isActive={false}
+            isActive={fanActive}
+            onToggle={(state) => toggleActuator("fan", state)}
           />
         </div>
       </div>
