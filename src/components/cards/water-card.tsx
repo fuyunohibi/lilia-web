@@ -18,7 +18,7 @@ const WaterCard: React.FC<WaterCardProps> = ({ liquid_detected }) => {
       <h3 className="text-sm font-semibold text-neutral-800 mb-2 z-10 relative">
         💧 Water Tank
       </h3>
-      <div className="relative flex-1 w-full border-2 border-blue-400 rounded-xl overflow-hidden bg-white">
+      <div className="relative h-full w-full border-2 border-blue-400 rounded-xl overflow-hidden bg-white">
         <motion.div
           className={cn(
             "absolute bottom-0 left-0 w-full",

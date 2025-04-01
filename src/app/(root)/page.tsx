@@ -18,35 +18,72 @@ import {
 import { getGardenPlants } from "@/actions/gardens/gardens.actions";
 import Dashboard from "@/components/ui/dashboard";
 
+interface Team {
+  team_id: string;
+  team_name: string;
+}
+
+interface Garden {
+  garden_id: string;
+  garden_name: string;
+  is_default: boolean;
+}
+
+interface Plant {
+  plant_id: string;
+  plant_name: string;
+  plant_species: string;
+}
+
 const HomePage = () => {
   const router = useRouter();
 
-  const [teams, setTeams] = useState<any[]>([]);
-  const [gardens, setGardens] = useState<any[]>([]);
-  const [plants, setPlants] = useState<any[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [gardens, setGardens] = useState<Garden[]>([]);
+  const [plants, setPlants] = useState<Plant[]>([]);
 
   const [selectedTeam, setSelectedTeam] = useState<string>("");
   const [selectedGarden, setSelectedGarden] = useState<string>("");
 
   useEffect(() => {
-    const loadTeams = async () => {
+    const initializeDefaults = async () => {
       const user = await getCurrentUser();
       if (!user) return;
 
-      const { data } = await getCurrentUserTeams(user.id);
-      setTeams(data || []);
+      const { data: teamList } = await getCurrentUserTeams(user.id);
+      setTeams(teamList || []);
+
+      if (user.default_team_id) {
+        setSelectedTeam(user.default_team_id);
+
+        const { data: gardensData } = await getTeamGardens(
+          user.default_team_id
+        );
+        setGardens(gardensData || []);
+
+        const defaultGarden = gardensData?.find(
+          (garden: Garden) => garden.is_default
+        );
+        if (defaultGarden) {
+          setSelectedGarden(defaultGarden.garden_id);
+        }
+      }
     };
 
-    loadTeams();
+    initializeDefaults();
   }, []);
 
   useEffect(() => {
     const loadGardens = async () => {
       if (!selectedTeam) return;
 
-      const { data } = await getTeamGardens(selectedTeam);
-      setGardens(data || []);
-      setSelectedGarden(""); // Reset garden on team change
+      const { data: gardensData } = await getTeamGardens(selectedTeam);
+      setGardens(gardensData || []);
+
+      const defaultGarden = gardensData?.find(
+        (garden: Garden) => garden.is_default
+      );
+      setSelectedGarden(defaultGarden?.garden_id || "");
     };
 
     loadGardens();
@@ -65,7 +102,6 @@ const HomePage = () => {
   return (
     <PageWrapper>
       <div className="flex flex-col md:flex-row gap-4 mb-6">
-        {/* Select Team */}
         <div>
           <label className="mb-1 block text-sm font-medium">Select Team</label>
           <Select
@@ -97,7 +133,6 @@ const HomePage = () => {
           </Select>
         </div>
 
-        {/* Select Garden */}
         {selectedTeam && (
           <div>
             <label className="mb-1 block text-sm font-medium">
@@ -134,7 +169,6 @@ const HomePage = () => {
         )}
       </div>
 
-      {/* Plants in Selected Garden */}
       {selectedGarden && !["no-garden", "no-team"].includes(selectedGarden) && (
         <>
           <div>
@@ -171,5 +205,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-
