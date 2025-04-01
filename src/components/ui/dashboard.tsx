@@ -1,10 +1,15 @@
-import { useState, useEffect } from "react";
-import ActuatorCard from "../cards/sensor-card";
+"use client";
 
+import { useState, useEffect } from "react";
+import ActuatorCard from "../cards/actuator-card";
+import SensorCard from "../cards/sensor-card";
+import WaterCard from "../cards/water-card";
 
 const Dashboard = () => {
   const [pumpActive, setPumpActive] = useState(false);
   const [fanActive, setFanActive] = useState(false);
+  const [sensorData, setSensorData] = useState<any>(null);
+  const [moistureHistory, setMoistureHistory] = useState<any[]>([]);
 
   const fetchActuatorState = async () => {
     try {
@@ -24,6 +29,58 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchActuatorState();
+
+    // MOCK SENSOR DATA
+    const history = [
+      {
+        soil_moisture1: 41,
+        soil_moisture2: 40,
+        liquid_detected: true,
+        temperature: 24.7,
+        humidity: 71.2,
+        light: 51.67,
+        timestamp: "2025-04-01T03:06:26.626Z",
+      },
+      {
+        soil_moisture1: 42,
+        soil_moisture2: 41,
+        liquid_detected: true,
+        temperature: 24.7,
+        humidity: 71.1,
+        light: 50.83,
+        timestamp: "2025-04-01T03:06:29.572Z",
+      },
+      {
+        soil_moisture1: 41,
+        soil_moisture2: 39,
+        liquid_detected: true,
+        temperature: 24.7,
+        humidity: 71.1,
+        light: 50.83,
+        timestamp: "2025-04-01T03:06:32.643Z",
+      },
+      {
+        soil_moisture1: 41,
+        soil_moisture2: 39,
+        liquid_detected: true,
+        temperature: 24.7,
+        humidity: 71.0,
+        light: 50.83,
+        timestamp: "2025-04-01T03:06:35.615Z",
+      },
+      {
+        soil_moisture1: 41,
+        soil_moisture2: 40,
+        liquid_detected: true,
+        temperature: 24.7,
+        humidity: 70.9,
+        light: 50.83,
+        timestamp: "2025-04-01T03:06:38.685Z",
+      },
+    ];
+
+    setSensorData(history[history.length - 1]); // latest for display
+    setMoistureHistory(history); // full history for line chart
   }, []);
 
   const toggleActuator = async (type: "pump" | "fan", state: boolean) => {
@@ -42,69 +99,32 @@ const Dashboard = () => {
       console.error(`❌ Failed to toggle ${type}:`, err);
     }
   };
-  // const [selectedRoom, setSelectedRoom] = useState<
-  //   "Home" | "Living Room" | "Bedroom"
-  // >("Home");
-
-  // const aircons = getAircons();
-  // const lights = getLights();
 
   return (
-    <div className="flex flex-1 ml-10 my-6 mr-6 ">
-      <div className="flex flex-col gap-3 flex-1 w-full h-full rounded-3xl">
-        {/* TOP ROW */}
-        {/* <div className="flex gap-3 h-[60%]">
-          <HomeManagementCard
-            currentPage="home"
-            username={
-              user ? `${user.first_name} ${user.last_name}` : "John Doe"
-            }
-            backgroundImage="https://christophorus.porsche.com/.imaging/mte/porsche-templating-theme/image_1080x624/dam/Christophorus-Website/C412/Zusatzgalerien-und-Thumbnails/Garage/24_06_03_Christophorus_TheNordicBarnProject-0110.jpg/jcr:content/24_06_03_Christophorus_TheNordicBarnProject-0110.jpg"
-            livingRoomImage="https://images.unsplash.com/photo-1616940844649-535215ae4eb1?q=80&w=2487&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            bedroomImage="https://images.unsplash.com/photo-1727706572437-4fcda0cbd66f?q=80&w=2371&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-            onTabChange={(tab) => setSelectedRoom(tab)}
-          />
-          <DeviceCard
-            airConditionersCount={
-              (selectedRoom === "Home"
-                ? [
-                    ...(aircons["Living Room"] || []),
-                    ...(aircons["Bedroom"] || []),
-                  ]
-                : aircons[selectedRoom as "Living Room" | "Bedroom"] || []
-              ).filter((device) => device).length || 0
-            }
-            lightsCount={
-              (selectedRoom === "Home"
-                ? [
-                    ...(lights["Living Room"] || []),
-                    ...(lights["Bedroom"] || []),
-                  ]
-                : lights[selectedRoom as "Living Room" | "Bedroom"] || []
-              ).filter((device) => device).length || 0
-            }
-            selectedRoom={selectedRoom}
-            aircons={aircons}
-            lights={lights}
-          />
-        </div> */}
-
-          {/* BOTTOM ROW */}
-          <div className="flex gap-3 h-[40%]">
-          <ActuatorCard
-            title="Water Pump"
-            description="My Water Pump"
-            backgroundImage="https://tomahawk-power.com/cdn/shop/articles/wide_angle_1024x.jpg?v=1623716961"
-            isActive={pumpActive}
-            onToggle={(state) => toggleActuator("pump", state)}
-          />
-          <ActuatorCard
-            title="Fan"
-            description="My Fan"
-            backgroundImage="https://m.media-amazon.com/images/I/810r2WWqGoL._AC_UF894,1000_QL80_.jpg"
-            isActive={fanActive}
-            onToggle={(state) => toggleActuator("fan", state)}
-          />
+    <div className="flex flex-1 ml-10 my-6 mr-6">
+      <div className="flex flex-col gap-6 flex-1 w-full h-full rounded-3xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
+            {/* Water Display */}
+            <WaterCard liquid_detected={sensorData?.liquid_detected} />
+            {/*  Actuator OverView */}
+            <ActuatorCard
+              title="Water Pump"
+              description="My Water Pump"
+              backgroundImage="https://tomahawk-power.com/cdn/shop/articles/wide_angle_1024x.jpg?v=1623716961"
+              isActive={pumpActive}
+              onToggle={(state) => toggleActuator("pump", state)}
+            />
+            <ActuatorCard
+              title="Fan"
+              description="My Fan"
+              backgroundImage="https://m.media-amazon.com/images/I/810r2WWqGoL._AC_UF894,1000_QL80_.jpg"
+              isActive={fanActive}
+              onToggle={(state) => toggleActuator("fan", state)}
+            />
+          </div>
+          {/* Sensor Overview Display */}
+          <SensorCard data={sensorData} history={moistureHistory} />
         </div>
       </div>
     </div>
