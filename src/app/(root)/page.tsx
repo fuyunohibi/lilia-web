@@ -18,6 +18,7 @@ import {
 import Dashboard from "@/components/ui/dashboard";
 import Image from "next/image";
 import { getPlants } from "@/actions/plants/plants.actions";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 
 interface Team {
@@ -103,6 +104,8 @@ const HomePage = () => {
 
   return (
     <PageWrapper>
+      {/* NOTIFICATION  */}
+      <NotificationBell />
       <div className="flex flex-col md:flex-row md:items-end gap-4 mb-6">
         <div className="w-full md:w-64">
           <label className="mb-1 block text-sm font-medium">Select Team</label>
