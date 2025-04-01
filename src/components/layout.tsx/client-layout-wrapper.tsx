@@ -61,7 +61,7 @@ export default function ClientLayoutWrapper({
     },
     {
       label: "Weather",
-      href: "#",
+      href: "/weather",
       icon: (
         <IconCloud className="h-6 w-6 shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
