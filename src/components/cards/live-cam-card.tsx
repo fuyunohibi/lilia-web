@@ -2,6 +2,8 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import io from "socket.io-client";
+import { useEffect, useState } from "react";
 
 interface LiveCamCardProps {
   title: string;
@@ -23,6 +25,19 @@ const LiveCamCard = ({
   isWaterActive = false,
   isFanActive = false,
 }: LiveCamCardProps) => {
+  const [imageSrc, setImageSrc] = useState<string>("");
+
+  useEffect(() => {
+    const socket = io(videoSrc); // Connect to the video stream
+    socket.on("frame", (data) => {
+      setImageSrc(`data:image/jpeg;base64,${data.image}`);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [videoSrc]);
+
   return (
     <div className="relative h-full w-full rounded-3xl bg-gray-100 p-5 flex flex-col justify-between shadow-lg overflow-hidden">
       {/* Live Video */}
@@ -32,15 +47,12 @@ const LiveCamCard = ({
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeInOut" }}
       >
-        <video
-          src={videoSrc}
-          className="w-full h-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
+        <img
+          src={imageSrc}
+          className="object-cover rounded-3xl"
+          alt="Live Camera"
         />
-        <div className="absolute inset-0 bg-black/30 backdrop-blur-sm rounded-3xl" />
+        {/* <div className="absolute inset-0 bg-black/30 backdrop-blur-sm rounded-3xl" /> */}
       </motion.div>
 
       {/* Title & Description */}
