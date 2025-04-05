@@ -7,6 +7,9 @@ import { useState } from "react";
 import { CalendarClock, Edit, Trash } from "lucide-react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { getSchedules } from "@/actions/gardens/schedule.actions";
+import { updateSchedule } from "@/actions/gardens/schedule.actions";
+import { removeSchedule } from "@/actions/gardens/schedule.actions";
 
 interface Schedule {
     id: number;
@@ -18,12 +21,49 @@ interface Schedule {
 }
 
 interface ScheduleCardProps {
+    fetchSchedules: () => Promise<void>;
     schedule: Schedule;
     removeSchedule: (id: number) => void;
     setSchedules: React.Dispatch<React.SetStateAction<Schedule[]>>;
 }
 
-const ScheduleCard = ({ schedule, removeSchedule, setSchedules }: ScheduleCardProps) => {
+const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }: ScheduleCardProps) => {
+
+    const handleScheduleUpdate = async (id: number, day: string, time: string, triggered: boolean, active: boolean) => {
+        const created_at = new Date().toISOString();
+        try {
+            await updateSchedule(id, { day, time, triggered, active });
+            setSchedules((prev) =>
+                prev.map((s) => (s.id === id ? { ...s, day, time, triggered, active, created_at} : s))
+            );
+            fetchSchedules();
+        } catch (error) {
+            console.error("Error updating schedule:", error);
+        }
+    };
+
+    const handleScheduleDelete = async (id: number) => {
+        try {
+            await removeSchedule(id);
+            setSchedules((prev) => prev.filter((s) => s.id !== id));
+            fetchSchedules();
+        } catch (error) {
+            console.error("Error deleting schedule:", error);
+        }
+    };
+
+    const handleSwitchChange = (id: number, active: boolean) => {
+        setSchedules((prev) =>
+            prev.map((s) => (s.id === id ? { ...s, active } : s))
+        );
+        handleScheduleUpdate(id, schedule.day, schedule.time, false, active);
+        fetchSchedules();
+    };
+    const handleDeleteClick = (id: number) => {
+        setSchedules((prev) => prev.filter((s) => s.id !== id));
+        handleScheduleDelete(id);
+        fetchSchedules();
+    };
 
     return (
         <motion.div

@@ -67,6 +67,7 @@ const HomePage = () => {
         const defaultGarden = gardensData?.find(
           (garden: Garden) => garden.is_default
         );
+
         if (defaultGarden) {
           setSelectedGarden(defaultGarden.garden_id);
         }
@@ -102,6 +103,11 @@ const HomePage = () => {
     loadPlants();
   }, [selectedGarden]);
 
+  useEffect(() => {
+    console.log("Selected Garden ID:", selectedGarden); // Log garden ID to the console
+  }, [selectedGarden]);
+
+  
   return (
     <PageWrapper>
       {/* NOTIFICATION  */}

@@ -12,6 +12,8 @@ import { Trash, Edit } from "lucide-react";
 import { motion } from "framer-motion";
 import { Switch } from "../../../../../components/ui/switch";
 import ScheduleCard from "@/components/cards/schedule-card";
+import AddScheduleDialog from "@/components/gardens/add-schedule-dialog";
+import { getSchedules } from "@/actions/gardens/schedule.actions";
 
 interface Schedule {
   id: number;
@@ -47,8 +49,6 @@ interface Plant {
 
 const WateringSchedulePage = () => {
   const { gardenId } = useParams();
-  const [plants, setPlants] = useState<Plant[]>([]);
-  const today = dayjs().format("ddd"); // Mon, Tue, etc.
   const fullDate = dayjs().format("dddd, MMMM D YYYY");
   const fullTime = dayjs().format("hh:mm A");
 
@@ -56,44 +56,13 @@ const WateringSchedulePage = () => {
   const [newDay, setNewDay] = useState<string>("Today");
   const [newTime, setNewTime] = useState<string>("");
 
-  const addSchedule = () => {
-    if (!newDay || !newTime) return;
-  
-    // Prevent adding past time if selected day is Today
-    if (newDay === "Today") {
-      const now = dayjs();
-      const [inputHour, inputMinute] = newTime.split(":").map(Number);
-      const inputTime = dayjs().hour(inputHour).minute(inputMinute);
-  
-      if (inputTime.isBefore(now)) {
-        alert("You cannot set a time in the past for today.");
-        return;
-      }
+  const fetchSchedules = async () => {
+    try {
+      const { data } = await getSchedules(gardenId);
+      setSchedules(data);
+    } catch (error) {
+      console.error("Error fetching schedules:", error);
     }
-
-    // Prevent adding duplicate schedules
-    const isDuplicate = schedules.some(
-      (schedule) => schedule.day === newDay && schedule.time === newTime
-    );
-    if (isDuplicate) {
-      alert("This schedule already exists.");
-      return;
-    }
-
-    const newSchedule: Schedule = {
-      id: Date.now() + Math.floor(Math.random() * 1000),
-      day: newDay,
-      time: newTime,
-      triggered: false,
-      active: true,
-      created_at: dayjs().toISOString(), 
-    };
-  
-    setSchedules((prev) => [...prev, newSchedule]);
-    setNewDay("Today");
-    setNewTime("");
-    
-    console.log("New schedule added:", newSchedule);
   };
   
   const removeSchedule = (id: number) => {
@@ -132,6 +101,14 @@ const WateringSchedulePage = () => {
   // Background checker
   useEffect(() => {
     const interval = setInterval(() => {
+      const now = dayjs();
+      const [hour, minute] = now.format("HH:mm").split(":").map(Number);
+      const currentTime = dayjs().hour(hour).minute(minute);
+      const currentDay = now.format("dddd");
+      const isToday = currentDay === "Today";
+      const isTomorrow = currentDay === "Tomorrow";
+
+
       setSchedules((prevSchedules) =>
         prevSchedules.map((schedule) => {
           if (!schedule.triggered && isScheduleTriggered(schedule)) {
@@ -142,6 +119,7 @@ const WateringSchedulePage = () => {
           return schedule;
         })
       );
+      fetchSchedules();
     }, 60000); 
     
     console.log("all schedules:", schedules);
@@ -149,22 +127,11 @@ const WateringSchedulePage = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch plants
+  // Fetch schedules
   useEffect(() => {
     if (!gardenId) return;
 
-    const fetchPlants = async () => {
-      const res = await getPlants(gardenId as string);
-
-      if ("data" in res && Array.isArray(res.data)) {
-        setPlants(res.data);
-      } else {
-        console.error("Failed to load plants:", res.error || "Unknown error");
-        setPlants([]);
-      }
-    };
-
-    fetchPlants();
+    fetchSchedules();
   }, [gardenId]);
 
   return (
@@ -180,7 +147,11 @@ const WateringSchedulePage = () => {
 
         {/* Schedule input */}
         <div className="flex items-center justify-end ml-auto">
-          <select
+          <AddScheduleDialog
+            gardenId={gardenId as string}
+            fetchSchedules={fetchSchedules}
+          />
+          {/* <select
             value={newDay}
             onChange={(e) => setNewDay(e.target.value)}
             className="p-2 mx-6 rounded-md shadow-md dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-200"
@@ -202,7 +173,7 @@ const WateringSchedulePage = () => {
             className="flex items-center justify-between h-12 px-5 rounded-full bg-green-500 text-white shadow-lg cursor-pointer hover:bg-green-600 transition duration-200"
           >
             <h1 className="text-xl font-semibold">+ Add Schedule</h1>
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -226,6 +197,7 @@ const WateringSchedulePage = () => {
                 key={schedule.id}
               >
                 {ScheduleCard({
+                  fetchSchedules,
                   schedule,
                   removeSchedule,
                   setSchedules,
