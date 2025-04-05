@@ -11,7 +11,7 @@ import Image from "next/image";
 import { Trash, Edit } from "lucide-react";
 import { motion } from "framer-motion";
 import { Switch } from "../../../../../components/ui/switch";
-import { toInteger } from "lodash";
+import ScheduleCard from "@/components/cards/schedule-card";
 
 interface Schedule {
   id: number;
@@ -19,7 +19,7 @@ interface Schedule {
   time: string;
   triggered?: boolean;
   active: boolean;
-  createTimestamp: string;
+  created_at: string;
 }
 
 
@@ -86,7 +86,7 @@ const WateringSchedulePage = () => {
       time: newTime,
       triggered: false,
       active: true,
-      createTimestamp: dayjs().toISOString(), 
+      created_at: dayjs().toISOString(), 
     };
   
     setSchedules((prev) => [...prev, newSchedule]);
@@ -107,7 +107,7 @@ const WateringSchedulePage = () => {
   
     if (schedule.day === "Today") {
       // Use today logic
-      const createdDate = dayjs(schedule.createTimestamp);
+      const createdDate = dayjs(schedule.created_at);
       return (
         now.isSame(createdDate, "day") &&
         now.isSame(scheduledTime) &&
@@ -116,7 +116,7 @@ const WateringSchedulePage = () => {
     }
   
     if (schedule.day === "Tomorrow") {
-      const createdDate = dayjs(schedule.createTimestamp);
+      const createdDate = dayjs(schedule.created_at);
       const tomorrowDate = createdDate.add(1, "day");
   
       return (
@@ -224,60 +224,12 @@ const WateringSchedulePage = () => {
             return (
               <div
                 key={schedule.id}
-                className="flex min-w-60 h-28 m-2 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow"
               >
-                <div className="flex flex-col items-left justify-center gap-2">
-                  {/* Schedule time */}
-                  <div className="flex flex-row items-center gap-2">
-                    <CalendarClock
-                      className={schedule.active ? "text-green-500" : "text-gray-400"}
-                      size={20}
-                    />
-                    <p className="text-3xl font-semibold">
-                      {schedule.time}
-                    </p>
-                  </div>
-
-                  {/* Schedule day */}
-                  <p className="text-md font-regular text-gray-500">
-                    {schedule.day === "Tomorrow" ? "Tomorrow" : schedule.day === "Today" ? "Today" : "Every " + schedule.day}
-                  </p>
-                  
-                </div>
-
-                <div className="flex flex-col items-center justify-center gap-4 ml-auto">
-                  {/* Switch */}
-                  <motion.div
-                      initial={{ opacity: 0, y: -20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2, duration: 0.5 }}
-                    >
-                      <Switch
-                        checked={schedule.active}
-                        onCheckedChange={() => {
-                          setSchedules((prev) =>
-                            prev.map((s) =>
-                              s.id === schedule.id ? { ...s, active: !s.active } : s
-                            )
-                          );
-                          console.log("Switch toggled for schedule:", schedule.active);
-                        }}
-                        className={`${
-                          schedule.active} ? "bg-green-500" : "bg-gray-700"
-                        } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
-                      />
-                  </motion.div>
-
-                  {/* Edit and Delete buttons */}
-                  <div className="flex gap-2">
-                    <button className="text-blue-500 hover:text-blue-600">
-                      <Edit size={18} />
-                    </button>
-                    <button onClick={() => removeSchedule(schedule.id)} className="text-red-500 hover:text-red-600">
-                      <Trash size={18} />
-                    </button>
-                  </div>
-                </div>
+                {ScheduleCard({
+                  schedule,
+                  removeSchedule,
+                  setSchedules,
+                })}
               </div>
             );
           })
