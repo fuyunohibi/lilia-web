@@ -196,7 +196,8 @@ const HomePage = () => {
 
       {selectedGarden && !["no-garden", "no-team"].includes(selectedGarden) && (
         <>
-          <div>
+
+          {/* <div key="Plants">
             <h2 className="text-xl font-semibold mb-4">
               🌱 Plants in this Garden
             </h2>
@@ -230,7 +231,7 @@ const HomePage = () => {
                 ))}
               </div>
             )}
-          </div>
+          </div> */}
           <Dashboard />
         </>
       )}

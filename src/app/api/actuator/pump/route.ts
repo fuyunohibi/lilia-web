@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import mqtt from 'mqtt';
+import { getMqttClient } from '@/app/api/lib/mqttClient';
 
-// Local state just for this route file
 let lastKnownPumpState: "on" | "off" = "off";
-
-// MQTT client setup
-const mqttClient = mqtt.connect('ws://100.84.67.85:9001');
-
-mqttClient.on('connect', () => {
-  console.log('📡 Connected to MQTT broker (Pump)');
-});
+const mqttClient = getMqttClient();
 
 export async function POST(request: NextRequest) {
   const { command } = await request.json();

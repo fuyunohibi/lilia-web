@@ -53,7 +53,7 @@ const SensorCard: React.FC<SensorCardProps> = ({ data, history }) => {
 
   return (
     <motion.div
-      className="rounded-2xl bg-white dark:bg-neutral-900 shadow-sm p-4 border"
+      className="rounded-2xl bg-white dark:bg-neutral-900 shadow-sm p-5 border"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
     >

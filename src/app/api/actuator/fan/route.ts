@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import mqtt from 'mqtt';
-
+import { getMqttClient } from '@/app/api/lib/mqttClient';
 let lastKnownFanState: "on" | "off" = "off";
-
-const mqttClient = mqtt.connect('ws://100.84.67.85:9001');
-
-mqttClient.on('connect', () => {
-  console.log('📡 Connected to MQTT broker (Fan)');
-});
+const mqttClient = getMqttClient();
 
 export async function POST(request: NextRequest) {
   const { command } = await request.json();

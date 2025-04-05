@@ -11,7 +11,7 @@ interface WaterCardProps {
 const WaterCard: React.FC<WaterCardProps> = ({ liquid_detected }) => {
   return (
     <motion.div
-      className="flex flex-col justify-center items-start rounded-3xl bg-gray-100 overflow-hidden p-4"
+      className="flex flex-col justify-center items-start rounded-3xl bg-gray-100 overflow-hidden p-5 shadow-lg relative h-full w-full"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
     >

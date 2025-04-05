@@ -9,8 +9,8 @@ interface LiveCamCardProps {
   title: string;
   description: string;
   videoSrc: string;
-  onWater: () => void;
-  onFan: () => void;
+  onWater?: () => void;
+  onFan?: () => void;
   isWaterActive?: boolean;
   isFanActive?: boolean;
 }
@@ -48,7 +48,7 @@ const LiveCamCard = ({
         transition={{ duration: 0.8, ease: "easeInOut" }}
       >
         <img
-          src={imageSrc}
+          src={imageSrc || videoSrc + "/video"}
           className="object-cover rounded-3xl"
           alt="Live Camera"
         />
@@ -78,46 +78,48 @@ const LiveCamCard = ({
 
       {/* Actuator Buttons */}
       {/* Actuator Buttons */}
-      <motion.div
-        className="relative z-10 mt-4 flex gap-3"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
-      >
-        <button
-          onClick={onWater}
-          className={`px-4 py-2 text-sm rounded-full shadow-md transition-all duration-300 flex items-center gap-2 ${
-            isWaterActive
-              ? "bg-blue-600 ring-2 ring-blue-200"
-              : "bg-blue-500 hover:bg-blue-600"
-          } text-white`}
+      {onWater && onFan && (
+        <motion.div
+          className="relative z-10 mt-4 flex gap-3"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
         >
-          💧 Water
-          {isWaterActive && (
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-            </span>
-          )}
-        </button>
+          <button
+            onClick={onWater}
+            className={`px-4 py-2 text-sm rounded-full shadow-md transition-all duration-300 flex items-center gap-2 ${
+              isWaterActive
+                ? "bg-blue-600 ring-2 ring-blue-200"
+                : "bg-blue-500 hover:bg-blue-600"
+            } text-white`}
+          >
+            💧 Water
+            {isWaterActive && (
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+              </span>
+            )}
+          </button>
 
-        <button
-          onClick={onFan}
-          className={`px-4 py-2 text-sm rounded-full shadow-md transition-all duration-300 flex items-center gap-2 ${
-            isFanActive
-              ? "bg-indigo-600 ring-2 ring-indigo-200"
-              : "bg-indigo-500 hover:bg-indigo-600"
-          } text-white`}
-        >
-          🌬️ Fan
-          {isFanActive && (
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
-            </span>
-          )}
-        </button>
-      </motion.div>
+          <button
+            onClick={onFan}
+            className={`px-4 py-2 text-sm rounded-full shadow-md transition-all duration-300 flex items-center gap-2 ${
+              isFanActive
+                ? "bg-indigo-600 ring-2 ring-indigo-200"
+                : "bg-indigo-500 hover:bg-indigo-600"
+            } text-white`}
+          >
+            🌬️ Fan
+            {isFanActive && (
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+              </span>
+            )}
+          </button>
+        </motion.div>
+      )}
     </div>
   );
 };
