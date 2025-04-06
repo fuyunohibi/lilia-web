@@ -51,35 +51,13 @@ export const removeSchedule = async (id) => {
     throw new Error(`Error removing schedule via RPC: ${error.message}`);
   }
 };
-export const updateSchedule = async (id, day, time) => {
+export const updateSchedule = async (id, day, time, triggered, active) => {
   const supabase = await createClient();
   const { error } = await supabase.rpc("update_schedule", {
     p_id: id,
     p_day: day,
     p_time: time,
-  });
-
-  if (error) {
-    throw new Error(`Error updating schedule via RPC: ${error.message}`);
-  }
-}
-
-export const updateScheduleTriggered = async (id, triggered) => {
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("update_schedule_triggered", {
-    p_id: id,
     p_triggered: triggered,
-  });
-
-  if (error) {
-    throw new Error(`Error updating schedule via RPC: ${error.message}`);
-  }
-}
-
-export const updateScheduleActive = async (id, active) => {
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("update_schedule_active", {
-    p_id: id,
     p_active: active,
   });
 
@@ -87,3 +65,4 @@ export const updateScheduleActive = async (id, active) => {
     throw new Error(`Error updating schedule via RPC: ${error.message}`);
   }
 }
+

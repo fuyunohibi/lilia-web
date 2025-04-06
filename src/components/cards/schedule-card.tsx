@@ -32,7 +32,7 @@ const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }
     const handleScheduleUpdate = async (id: number, day: string, time: string, triggered: boolean, active: boolean) => {
         const created_at = new Date().toISOString();
         try {
-            await updateSchedule(id, { day, time, triggered, active });
+            await updateSchedule({id, day, time, triggered, active});
             setSchedules((prev) =>
                 prev.map((s) => (s.id === id ? { ...s, day, time, triggered, active, created_at} : s))
             );
@@ -43,8 +43,8 @@ const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }
     };
 
     
-
     const handleSwitchChange = (id: number, active: boolean) => {
+        console.log("Switch changed to:", id, active);
         setSchedules((prev) =>
             prev.map((s) => (s.id === id ? { ...s, active } : s))
         );
@@ -85,12 +85,7 @@ const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }
                     <Switch
                     checked={schedule.active}
                     onCheckedChange={() => {
-                        setSchedules((prev) =>
-                        prev.map((s) =>
-                            s.id === schedule.id ? { ...s, active: !s.active } : s
-                        )
-                        );
-                        console.log("Switch toggled for schedule:", schedule.active);
+                        handleSwitchChange(schedule.id, !schedule.active);
                     }}
                     className={`${
                         schedule.active} ? "bg-green-500" : "bg-gray-700"
