@@ -75,7 +75,7 @@ const GardenPage = () => {
       const sensorCounts = await Promise.all(
         (data || []).map(async (garden: any) => {
           const res = await getGardenSensors(garden.garden_id);
-          console.log("garden id:", garden.garden_id, "sensors:", res.data); // Now should be correct
+          // console.log("garden id:", garden.garden_id, "sensors:", res.data); // Now should be correct
           return [garden.garden_id, res.data?.length || 0];
         })
       );

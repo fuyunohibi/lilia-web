@@ -38,6 +38,7 @@ interface Plant {
   plant_image_url: string;
 }
 
+
 const HomePage = () => {
   const router = useRouter();
 
@@ -107,7 +108,7 @@ const HomePage = () => {
     console.log("Selected Garden ID:", selectedGarden); // Log garden ID to the console
   }, [selectedGarden]);
 
-  
+
   return (
     <PageWrapper>
       {/* NOTIFICATION  */}
@@ -238,7 +239,7 @@ const HomePage = () => {
               </div>
             )}
           </div> */}
-          <Dashboard />
+          <Dashboard gardenId={selectedGarden}/>
         </>
       )}
     </PageWrapper>

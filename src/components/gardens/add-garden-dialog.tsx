@@ -19,16 +19,18 @@ function AddGardenDialog({ teamId }: { teamId: string }) {
   const [gardenName, setGardenName] = useState("");
   const [gardenLocation, setGardenLocation] = useState("");
   const [isDefault, setIsDefault] = useState(false);
+  const [deviceId, setDeviceId] = useState(""); 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!teamId || !gardenName || !gardenLocation) return;
+    if (!teamId || !gardenName || !gardenLocation || !deviceId) return;
 
     try {
       await addGarden({
         team_id: teamId,
         garden_name: gardenName,
         garden_location: gardenLocation,
+        device_id: deviceId,
         is_default: isDefault,
       });
       toast.success("Garden added!");
@@ -36,6 +38,7 @@ function AddGardenDialog({ teamId }: { teamId: string }) {
       setGardenName("");
       setGardenLocation("");
       setIsDefault(false);
+      setDeviceId("");
     } catch (error) {
       console.error("Error adding garden", error);
       toast.error("Failed to add garden");
@@ -74,6 +77,20 @@ function AddGardenDialog({ teamId }: { teamId: string }) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
+              Device ID
+            </label>
+            <input
+              type="text"
+              value={deviceId}
+              onChange={(e) => setDeviceId(e.target.value)}
+              placeholder="Enter garden Device"
+              className="w-full rounded-2xl border border-gray-300 p-3 focus:border-[#00A35B] focus:outline-none"
+            />
+          </div>
+
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Garden Location
             </label>
             <input
@@ -102,9 +119,9 @@ function AddGardenDialog({ teamId }: { teamId: string }) {
           <DialogFooter>
             <button
               type="submit"
-              disabled={!teamId || !gardenName || !gardenLocation}
+              disabled={!teamId || !gardenName || !gardenLocation || !deviceId}
               className={`w-full rounded-full px-4 py-2 text-white ${
-                !teamId || !gardenName || !gardenLocation
+                !teamId || !gardenName || !gardenLocation || !deviceId
                   ? "bg-gray-300 cursor-not-allowed"
                   : "bg-[#00A35B] hover:bg-[#029b56]"
               }`}

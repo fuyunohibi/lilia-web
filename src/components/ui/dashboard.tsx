@@ -7,7 +7,12 @@ import SensorCard from "../cards/sensor-card";
 import WaterCard from "../cards/water-card";
 import SensorSmallCard from "../cards/sensor-card-small";
 
-const Dashboard = () => {
+
+interface DashboardProps {
+  gardenId: string;
+}
+
+const Dashboard = ({ gardenId }: DashboardProps) => {
   const { pumpActive, fanActive, toggleActuator, fetchActuatorState } =
     useActuatorStore();
 
@@ -15,8 +20,9 @@ const Dashboard = () => {
   const [moistureHistory, setMoistureHistory] = useState<any[]>([]);
 
   const fetchSensorData = async () => {
+    if (!gardenId) return;
     try {
-      const res = await fetch("/api/sensor");
+      const res = await fetch(`/api/sensor?garden_id=${gardenId}`);
       const json = await res.json();
       const latest = json.data;
       setSensorData(latest);

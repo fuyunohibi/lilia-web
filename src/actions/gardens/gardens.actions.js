@@ -6,10 +6,13 @@ import { createClient } from "@/utils/supabase/server";
 export async function addGarden(data) {
   const supabase = await createClient();
 
+  console.log(data);
+  
   const { error } = await supabase.rpc("add_garden", {
     p_team_id: data.team_id,
     p_garden_name: data.garden_name,
     p_garden_location: data.garden_location,
+    p_device_id: data.device_id,
     p_is_default: data.is_default,
   });
 
