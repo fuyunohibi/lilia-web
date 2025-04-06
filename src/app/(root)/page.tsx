@@ -1,5 +1,5 @@
 "use client";
-
+import { useGardenStore } from "@/app/api/stores/garden-store";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import PageWrapper from "@/components/layout.tsx/page-content";
@@ -48,6 +48,8 @@ const HomePage = () => {
 
   const [selectedTeam, setSelectedTeam] = useState<string>("");
   const [selectedGarden, setSelectedGarden] = useState<string>("");
+  const { setSelectedGardenId } = useGardenStore();
+
 
   useEffect(() => {
     const initializeDefaults = async () => {
@@ -71,6 +73,7 @@ const HomePage = () => {
 
         if (defaultGarden) {
           setSelectedGarden(defaultGarden.garden_id);
+          setSelectedGardenId(defaultGarden.garden_id);
         }
       }
     };
@@ -157,6 +160,9 @@ const HomePage = () => {
                   router.push("/gardens");
                 } else {
                   setSelectedGarden(value);
+                  setSelectedGardenId(value);
+                  // log the selected garden ID
+                  console.log("Selected Garden ID:", value);
                 }
               }}
             >

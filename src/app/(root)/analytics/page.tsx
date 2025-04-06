@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useGardenStore } from "@/app/api/stores/garden-store";
 import { AreaChart, Area, CartesianGrid, XAxis } from "recharts";
 import {
   Card,
@@ -19,6 +20,14 @@ import {
 } from "@/components/charts/chart";
 import PageWrapper from "@/components/layout.tsx/page-content";
 
+interface ChartDataPoint {
+  time: string;
+  vpd: number;
+  dli: number;
+  soil_water_deficit_estimation: number;
+  plant_heat_stress: number;
+}
+
 const chartConfig: ChartConfig = {
   vpd: { label: "VPD", color: "hsl(var(--chart-1))" },
   dli: { label: "DLI", color: "hsl(var(--chart-2))" },
@@ -33,12 +42,15 @@ const chartConfig: ChartConfig = {
 };
 
 const AnalyticsPage = () => {
-  const [data, setData] = useState<any[]>([]);
+  const { selectedGardenId } = useGardenStore();
+  const [data, setData] = useState<ChartDataPoint[]>([]);
+
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!selectedGardenId) return;
       try {
-        const res = await fetch("/api/analytics");
+        const res = await fetch(`/api/analytics?garden_id=${selectedGardenId}`);
         const json = await res.json();
   
         if (!Array.isArray(json.data)) {
@@ -63,12 +75,14 @@ const AnalyticsPage = () => {
       }
     };
   
-    // fetchData(); // first fetch immediately
-  //fetchData every 60 minutes
+    fetchData();
     const interval = setInterval(fetchData, 60 * 60 * 1000); // every hour
-    fetchData(); // also fetch immediately
-    return () => clearInterval(interval); // cleanup on unmount
-  }, []);
+    return () => clearInterval(interval);
+  }, [selectedGardenId]);
+
+  useEffect(() => {
+    console.log("📍 selectedGardenId:", selectedGardenId); // check if it's defined
+  }, [selectedGardenId]);
   
 
   return (

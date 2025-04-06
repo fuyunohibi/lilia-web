@@ -39,12 +39,14 @@ const Dashboard = ({ gardenId }: DashboardProps) => {
   };
 
   useEffect(() => {
+    if (!gardenId) return;
+
     fetchActuatorState();
     fetchSensorData();
 
     const interval = setInterval(fetchSensorData, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [gardenId]);
 
   return (
     <div className="flex flex-1">
