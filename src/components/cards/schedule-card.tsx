@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSchedules } from "@/actions/gardens/schedule.actions";
 import { updateSchedule } from "@/actions/gardens/schedule.actions";
-import { removeSchedule } from "@/actions/gardens/schedule.actions";
+import RemoveScheduleDialog from "../gardens/remove-garden-dialog";
 
 interface Schedule {
     id: number;
@@ -42,26 +42,13 @@ const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }
         }
     };
 
-    const handleScheduleDelete = async (id: number) => {
-        try {
-            await removeSchedule(id);
-            setSchedules((prev) => prev.filter((s) => s.id !== id));
-            fetchSchedules();
-        } catch (error) {
-            console.error("Error deleting schedule:", error);
-        }
-    };
+    
 
     const handleSwitchChange = (id: number, active: boolean) => {
         setSchedules((prev) =>
             prev.map((s) => (s.id === id ? { ...s, active } : s))
         );
         handleScheduleUpdate(id, schedule.day, schedule.time, false, active);
-        fetchSchedules();
-    };
-    const handleDeleteClick = (id: number) => {
-        setSchedules((prev) => prev.filter((s) => s.id !== id));
-        handleScheduleDelete(id);
         fetchSchedules();
     };
 
@@ -83,7 +70,7 @@ const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }
 
                 {/* Schedule day */}
                 <p className="text-md font-regular text-gray-500">
-                {schedule.day === "Tomorrow" ? "Tomorrow" : schedule.day === "Today" ? "Today" : "Every " + schedule.day}
+                {schedule.day === "No Repeat" ? "No Repeat" : "Every " + schedule.day}
                 </p>
                 
             </div>
@@ -113,12 +100,25 @@ const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }
 
                 {/* Edit and Delete buttons */}
                 <div className="flex gap-2">
-                <button className="text-blue-500 hover:text-blue-600">
+                <button 
+                    className="text-blue-500 hover:text-blue-600"
+                    onClick={() => {
+                        const newDay = prompt("Enter new day:", schedule.day);
+                        const newTime = prompt("Enter new time:", schedule.time);
+                        if (newDay && newTime) {
+                            handleScheduleUpdate(schedule.id, newDay, newTime, schedule.triggered || false, schedule.active);
+                        }
+                    }}
+                >
                     <Edit size={18} />
                 </button>
-                <button onClick={() => removeSchedule(schedule.id)} className="text-red-500 hover:text-red-600">
-                    <Trash size={18} />
-                </button>
+                <RemoveScheduleDialog
+                    scheduleId={schedule.id}
+                    fetchSchedules={fetchSchedules}
+                    removeSchedule={removeSchedule}
+                    setSchedules={setSchedules}
+                />
+                
                 </div>
             </div>
         </motion.div>

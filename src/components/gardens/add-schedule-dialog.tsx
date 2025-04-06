@@ -13,8 +13,7 @@ import { toast } from "sonner";
 import { addSchedule } from "@/actions/gardens/schedule.actions";
 
 const daysOfWeek = [
-    "Today",
-    "Tomorrow",
+    "No Repeat",
     "Monday",
     "Tuesday",
     "Wednesday",
@@ -98,19 +97,19 @@ function AddScheduleDialog({ gardenId, fetchSchedules }: { gardenId: string; fet
     
           <DialogFooter className="mt-4 mx-auto gap-8">
             <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="flex items-center justify-center h-12 px-5 rounded-full bg-neutral-500 text-white shadow-lg cursor-pointer hover:bg-neutral-600 transition duration-200"
+            >
+              <h1 className="text-xl font-semibold">Cancel</h1>
+            </button>
+            <button
               type="submit"
               onClick={() => setOpen(false)}
               disabled={!scheduleDay || !scheduleTime}
               className="flex items-center justify-center h-12 px-5 rounded-full bg-green-500 text-white shadow-lg cursor-pointer hover:bg-green-600 transition duration-200"
             >
               <h1 className="text-xl font-semibold">Add</h1>
-            </button>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="flex items-center justify-center h-12 px-5 rounded-full bg-neutral-500 text-white shadow-lg cursor-pointer hover:bg-neutral-600 transition duration-200"
-            >
-              <h1 className="text-xl font-semibold">Cancel</h1>
             </button>
           </DialogFooter>
         </form>

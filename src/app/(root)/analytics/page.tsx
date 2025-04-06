@@ -16,7 +16,6 @@ import {
   ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-  ChartConfig,
 } from "@/components/charts/chart";
 import PageWrapper from "@/components/layout.tsx/page-content";
 
@@ -26,6 +25,13 @@ interface ChartDataPoint {
   dli: number;
   soil_water_deficit_estimation: number;
   plant_heat_stress: number;
+}
+
+interface ChartConfig {
+  [key: string]: {
+    label: string;
+    color: string;
+  };
 }
 
 const chartConfig: ChartConfig = {
@@ -86,11 +92,7 @@ const AnalyticsPage = () => {
   //   console.log("📍 selectedGardenId:", selectedGardenId); // check if it's defined
   // }, [selectedGardenId]);
 
-  useEffect(() => {
-    const time = new Date().toLocaleTimeString();
-    setUpdatedTime(time);
-  }, []);
-  
+
 
   return (
     <PageWrapper>

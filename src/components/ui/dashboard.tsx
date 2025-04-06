@@ -40,10 +40,10 @@ const Dashboard = ({ gardenId }: DashboardProps) => {
 
   useEffect(() => {
     if (!gardenId) return;
-
-    fetchActuatorState();
+  
+    fetchActuatorState(gardenId);
     fetchSensorData();
-
+  
     const interval = setInterval(fetchSensorData, 5000);
     return () => clearInterval(interval);
   }, [gardenId]);
@@ -65,14 +65,15 @@ const Dashboard = ({ gardenId }: DashboardProps) => {
               description="My Water Pump"
               backgroundImage="https://tomahawk-power.com/cdn/shop/articles/wide_angle_1024x.jpg?v=1623716961"
               isActive={pumpActive}
-              onToggle={(state) => toggleActuator("pump", state)}
+              onToggle={(state) => toggleActuator("pump", state, gardenId)}
+
             />
             <ActuatorCard
               title="Fan"
               description="My Fan"
               backgroundImage="https://m.media-amazon.com/images/I/810r2WWqGoL._AC_UF894,1000_QL80_.jpg"
               isActive={fanActive}
-              onToggle={(state) => toggleActuator("fan", state)}
+              onToggle={(state) => toggleActuator("fan", state, gardenId)}
             />
           </div>
           {/* <SensorCard data={sensorData} history={moistureHistory} /> */}

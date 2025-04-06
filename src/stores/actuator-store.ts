@@ -6,28 +6,37 @@ type ActuatorType = "pump" | "fan";
 interface ActuatorState {
   pumpActive: boolean;
   fanActive: boolean;
-  toggleActuator: (type: ActuatorType, state: boolean) => Promise<void>;
-  fetchActuatorState: () => Promise<void>;
+  toggleActuator: (
+    type: ActuatorType,
+    state: boolean,
+    deviceId: string
+  ) => Promise<void>;
+  fetchActuatorState: (deviceId: string) => Promise<void>;
 }
 
 export const useActuatorStore = create<ActuatorState>((set) => ({
   pumpActive: false,
   fanActive: false,
 
-  toggleActuator: async (type, state) => {
+  toggleActuator: async (type, state, deviceId) => {
     set((prev) => ({
       ...prev,
       [`${type}Active`]: state,
     }));
 
     try {
-      await fetch(`/api/actuator/${type}`, {
+      const res = await fetch(`/api/actuator/${type}`, {
         method: "POST",
-        body: JSON.stringify({ command: state ? "on" : "off" }),
+        body: JSON.stringify({
+          command: state ? "on" : "off",
+          device_id: deviceId,
+        }),
         headers: {
           "Content-Type": "application/json",
         },
       });
+
+      if (!res.ok) throw new Error("Request failed");
 
       toast.success(
         `${type === "pump" ? "💧 Water" : "🌬️ Fan"} actuator ${
@@ -35,17 +44,18 @@ export const useActuatorStore = create<ActuatorState>((set) => ({
         }.`
       );
     } catch (err) {
-      console.error(`Failed to toggle ${type}:`, err);
+      console.error(`❌ Failed to toggle ${type}:`, err);
       toast.error(`❌ Failed to toggle ${type}.`);
     }
   },
 
-  fetchActuatorState: async () => {
+  fetchActuatorState: async (deviceId) => {
     try {
       const [pumpRes, fanRes] = await Promise.all([
-        fetch("/api/actuator/pump"),
-        fetch("/api/actuator/fan"),
+        fetch(`/api/actuator/pump?device_id=${deviceId}`),
+        fetch(`/api/actuator/fan?device_id=${deviceId}`),
       ]);
+
       const pumpData = await pumpRes.json();
       const fanData = await fanRes.json();
 
