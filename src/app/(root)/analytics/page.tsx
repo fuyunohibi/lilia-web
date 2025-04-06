@@ -44,7 +44,7 @@ const chartConfig: ChartConfig = {
 const AnalyticsPage = () => {
   const { selectedGardenId } = useGardenStore();
   const [data, setData] = useState<ChartDataPoint[]>([]);
-
+  const [updatedTime, setUpdatedTime] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,12 +52,12 @@ const AnalyticsPage = () => {
       try {
         const res = await fetch(`/api/analytics?garden_id=${selectedGardenId}`);
         const json = await res.json();
-  
+    
         if (!Array.isArray(json.data)) {
           console.error("Unexpected data format:", json);
           return;
         }
-  
+    
         const formatted = json.data.map((item: any) => ({
           time: new Date(item.timestamp).toLocaleTimeString([], {
             hour: "2-digit",
@@ -68,21 +68,28 @@ const AnalyticsPage = () => {
           soil_water_deficit_estimation: item.soil_water_deficit_estimation,
           plant_heat_stress: item.plant_heat_stress,
         }));
-  
+    
         setData(formatted);
+        setUpdatedTime(new Date().toLocaleTimeString()); // ✅ Update this on each fetch
       } catch (err) {
         console.error("Failed to fetch sensor data:", err);
       }
     };
+    
   
     fetchData();
     const interval = setInterval(fetchData, 60 * 60 * 1000); // every hour
     return () => clearInterval(interval);
   }, [selectedGardenId]);
 
+  // useEffect(() => {
+  //   console.log("📍 selectedGardenId:", selectedGardenId); // check if it's defined
+  // }, [selectedGardenId]);
+
   useEffect(() => {
-    console.log("📍 selectedGardenId:", selectedGardenId); // check if it's defined
-  }, [selectedGardenId]);
+    const time = new Date().toLocaleTimeString();
+    setUpdatedTime(time);
+  }, []);
   
 
   return (
@@ -97,7 +104,7 @@ const AnalyticsPage = () => {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500"></span>
                 </span>
-                <span>Updated • {new Date().toLocaleTimeString()}</span>
+                <span>Updated • {updatedTime}</span>
               </div>
             </div>
 
