@@ -9,16 +9,16 @@ interface ActuatorState {
   toggleActuator: (
     type: ActuatorType,
     state: boolean,
-    deviceId: string
+    gardenId: string
   ) => Promise<void>;
-  fetchActuatorState: (deviceId: string) => Promise<void>;
+  fetchActuatorState: (gardenId: string) => Promise<void>;
 }
 
 export const useActuatorStore = create<ActuatorState>((set) => ({
   pumpActive: false,
   fanActive: false,
 
-  toggleActuator: async (type, state, deviceId) => {
+  toggleActuator: async (type, state, gardenId) => {
     set((prev) => ({
       ...prev,
       [`${type}Active`]: state,
@@ -29,7 +29,7 @@ export const useActuatorStore = create<ActuatorState>((set) => ({
         method: "POST",
         body: JSON.stringify({
           command: state ? "on" : "off",
-          device_id: deviceId,
+          garden_id: gardenId,
         }),
         headers: {
           "Content-Type": "application/json",
@@ -49,11 +49,18 @@ export const useActuatorStore = create<ActuatorState>((set) => ({
     }
   },
 
-  fetchActuatorState: async (deviceId) => {
+  fetchActuatorState: async (gardenId) => {
     try {
+      // ✅ Resolve device_id first
+      const deviceRes = await fetch(`/api/device?garden_id=${gardenId}`);
+      const { device_id } = await deviceRes.json();
+
+      if (!device_id) throw new Error("Device ID not found");
+
+      // ✅ Then fetch state using the correct device_id
       const [pumpRes, fanRes] = await Promise.all([
-        fetch(`/api/actuator/pump?device_id=${deviceId}`),
-        fetch(`/api/actuator/fan?device_id=${deviceId}`),
+        fetch(`/api/actuator/pump?device_id=${device_id}`),
+        fetch(`/api/actuator/fan?device_id=${device_id}`),
       ]);
 
       const pumpData = await pumpRes.json();

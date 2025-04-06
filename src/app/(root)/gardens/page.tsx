@@ -24,6 +24,8 @@ import AddSensorDialog from "@/components/sensors/add-sensor-dialog";
 import { PlantDetailsDialog } from "@/components/plants/plant-details-dialog";
 import Image from "next/image";
 import { getPlants } from "@/actions/plants/plants.actions";
+import EditDefaultGardenDialog from "@/components/gardens/edit-default-garden-dialog";
+
 
 const GardenPage = () => {
   const [teams, setTeams] = useState<any[]>([]);
@@ -128,7 +130,19 @@ const GardenPage = () => {
               ))}
             </SelectContent>
           </Select>
-          {selectedTeamId && <AddGardenDialog teamId={selectedTeamId} />}
+          {/* {selectedTeamId && <AddGardenDialog teamId={selectedTeamId} />} */}
+          {selectedTeamId && (
+            <>
+              <AddGardenDialog teamId={selectedTeamId} />
+              <EditDefaultGardenDialog
+                teamId={selectedTeamId}
+                gardens={gardens}
+                onChange={() => {
+                  setSelectedTeamId((prev) => prev);
+                }}
+              />
+            </>
+          )}
         </div>
       </motion.div>
 

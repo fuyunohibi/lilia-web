@@ -47,6 +47,7 @@ const Dashboard = ({ gardenId }: DashboardProps) => {
     const interval = setInterval(fetchSensorData, 5000);
     return () => clearInterval(interval);
   }, [gardenId]);
+  
 
   return (
     <div className="flex flex-1">

@@ -25,3 +25,39 @@ export async function addGarden(data) {
   return { success: true };
 }
 
+
+export async function getDefaultGarden(teamId) {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("gardens")
+    .select("*")
+    .eq("team_id", teamId)
+    .eq("is_default", true)
+    .single();
+
+  if (error) throw error;
+  return { data };
+}
+
+export async function setDefaultGarden(gardenId) {
+  const supabase = await createClient();
+
+  const { data: garden, error: gardenError } = await supabase
+    .from("gardens")
+    .select("team_id")
+    .eq("garden_id", gardenId)
+    .single();
+
+  if (gardenError || !garden)
+    throw gardenError ?? new Error("Garden not found");
+
+  const teamId = garden.team_id;
+
+  const { error } = await supabase.rpc("set_default_garden_transaction", {
+    input_garden_id: gardenId,
+    input_team_id: teamId,
+  });
+
+  if (error) throw error;
+}
