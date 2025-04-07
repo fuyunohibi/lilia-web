@@ -9,10 +9,11 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSchedules } from "@/actions/gardens/schedule.actions";
 import { updateSchedule } from "@/actions/gardens/schedule.actions";
-import { removeSchedule } from "@/actions/gardens/schedule.actions";
+import RemoveScheduleDialog from "../gardens/remove-garden-dialog";
+import UpdateScheduleDialog from "../gardens/update-schedule-dialog";
 
 interface Schedule {
-    id: number;
+    id: string;
     day: string;
     time: string;
     triggered?: boolean;
@@ -23,16 +24,16 @@ interface Schedule {
 interface ScheduleCardProps {
     fetchSchedules: () => Promise<void>;
     schedule: Schedule;
-    removeSchedule: (id: number) => void;
+    removeSchedule: (id: string) => void;
     setSchedules: React.Dispatch<React.SetStateAction<Schedule[]>>;
 }
 
 const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }: ScheduleCardProps) => {
 
-    const handleScheduleUpdate = async (id: number, day: string, time: string, triggered: boolean, active: boolean) => {
+    const handleScheduleUpdate = async (id: string, day: string, time: string, triggered: boolean, active: boolean) => {
         const created_at = new Date().toISOString();
         try {
-            await updateSchedule(id, { day, time, triggered, active });
+            await updateSchedule({id, day, time, triggered, active});
             setSchedules((prev) =>
                 prev.map((s) => (s.id === id ? { ...s, day, time, triggered, active, created_at} : s))
             );
@@ -42,26 +43,13 @@ const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }
         }
     };
 
-    const handleScheduleDelete = async (id: number) => {
-        try {
-            await removeSchedule(id);
-            setSchedules((prev) => prev.filter((s) => s.id !== id));
-            fetchSchedules();
-        } catch (error) {
-            console.error("Error deleting schedule:", error);
-        }
-    };
-
-    const handleSwitchChange = (id: number, active: boolean) => {
+    
+    const handleSwitchChange = (id: string, active: boolean) => {
+        console.log("Switch changed to:", id, active);
         setSchedules((prev) =>
             prev.map((s) => (s.id === id ? { ...s, active } : s))
         );
         handleScheduleUpdate(id, schedule.day, schedule.time, false, active);
-        fetchSchedules();
-    };
-    const handleDeleteClick = (id: number) => {
-        setSchedules((prev) => prev.filter((s) => s.id !== id));
-        handleScheduleDelete(id);
         fetchSchedules();
     };
 
@@ -83,7 +71,7 @@ const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }
 
                 {/* Schedule day */}
                 <p className="text-md font-regular text-gray-500">
-                {schedule.day === "Tomorrow" ? "Tomorrow" : schedule.day === "Today" ? "Today" : "Every " + schedule.day}
+                {schedule.day === "No Repeat" ? "No Repeat" : "Every " + schedule.day}
                 </p>
                 
             </div>
@@ -96,29 +84,32 @@ const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }
                     transition={{ delay: 0.2, duration: 0.5 }}
                 >
                     <Switch
-                    checked={schedule.active}
-                    onCheckedChange={() => {
-                        setSchedules((prev) =>
-                        prev.map((s) =>
-                            s.id === schedule.id ? { ...s, active: !s.active } : s
-                        )
-                        );
-                        console.log("Switch toggled for schedule:", schedule.active);
-                    }}
-                    className={`${
-                        schedule.active} ? "bg-green-500" : "bg-gray-700"
-                    } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
+                        checked={schedule.active}
+                        onCheckedChange={() => {
+                            handleSwitchChange(schedule.id, !schedule.active);
+                        }}
+                        className={`${
+                            schedule.active} ? "bg-green-500" : "bg-gray-700"
+                        } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
                     />
                 </motion.div>
 
                 {/* Edit and Delete buttons */}
                 <div className="flex gap-2">
-                <button className="text-blue-500 hover:text-blue-600">
-                    <Edit size={18} />
-                </button>
-                <button onClick={() => removeSchedule(schedule.id)} className="text-red-500 hover:text-red-600">
-                    <Trash size={18} />
-                </button>
+                <UpdateScheduleDialog
+                    scheduleId={schedule.id}
+                    schedule={schedule}
+                    fetchSchedules={fetchSchedules}
+                    handleScheduleUpdate={handleScheduleUpdate}
+                />
+
+                <RemoveScheduleDialog
+                    scheduleId={schedule.id}
+                    fetchSchedules={fetchSchedules}
+                    removeSchedule={removeSchedule}
+                    setSchedules={setSchedules}
+                />
+                
                 </div>
             </div>
         </motion.div>

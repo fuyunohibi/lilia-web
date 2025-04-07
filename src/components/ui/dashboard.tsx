@@ -6,18 +6,17 @@ import ActuatorCard from "../cards/actuator-card";
 import SensorCard from "../cards/sensor-card";
 import WaterCard from "../cards/water-card";
 import SensorSmallCard from "../cards/sensor-card-small";
-
+import useAlertWebSocket from "@/hooks/useAlertWebSocket";
 
 interface DashboardProps {
   gardenId: string;
 }
 
 const Dashboard = ({ gardenId }: DashboardProps) => {
-  const { pumpActive, fanActive, toggleActuator, fetchActuatorState } =
-    useActuatorStore();
-
+  const { pumpActive, fanActive, toggleActuator, fetchActuatorState } = useActuatorStore();
   const [sensorData, setSensorData] = useState<any>(null);
   const [moistureHistory, setMoistureHistory] = useState<any[]>([]);
+  useAlertWebSocket(gardenId);
 
   const fetchSensorData = async () => {
     if (!gardenId) return;
@@ -40,13 +39,14 @@ const Dashboard = ({ gardenId }: DashboardProps) => {
 
   useEffect(() => {
     if (!gardenId) return;
-
-    fetchActuatorState();
+  
+    fetchActuatorState(gardenId);
     fetchSensorData();
-
+  
     const interval = setInterval(fetchSensorData, 5000);
     return () => clearInterval(interval);
   }, [gardenId]);
+  
 
   return (
     <div className="flex flex-1">
@@ -65,14 +65,15 @@ const Dashboard = ({ gardenId }: DashboardProps) => {
               description="My Water Pump"
               backgroundImage="https://tomahawk-power.com/cdn/shop/articles/wide_angle_1024x.jpg?v=1623716961"
               isActive={pumpActive}
-              onToggle={(state) => toggleActuator("pump", state)}
+              onToggle={(state) => toggleActuator("pump", state, gardenId)}
+
             />
             <ActuatorCard
               title="Fan"
               description="My Fan"
               backgroundImage="https://m.media-amazon.com/images/I/810r2WWqGoL._AC_UF894,1000_QL80_.jpg"
               isActive={fanActive}
-              onToggle={(state) => toggleActuator("fan", state)}
+              onToggle={(state) => toggleActuator("fan", state, gardenId)}
             />
           </div>
           {/* <SensorCard data={sensorData} history={moistureHistory} /> */}

@@ -6,28 +6,37 @@ type ActuatorType = "pump" | "fan";
 interface ActuatorState {
   pumpActive: boolean;
   fanActive: boolean;
-  toggleActuator: (type: ActuatorType, state: boolean) => Promise<void>;
-  fetchActuatorState: () => Promise<void>;
+  toggleActuator: (
+    type: ActuatorType,
+    state: boolean,
+    gardenId: string
+  ) => Promise<void>;
+  fetchActuatorState: (gardenId: string) => Promise<void>;
 }
 
 export const useActuatorStore = create<ActuatorState>((set) => ({
   pumpActive: false,
   fanActive: false,
 
-  toggleActuator: async (type, state) => {
+  toggleActuator: async (type, state, gardenId) => {
     set((prev) => ({
       ...prev,
       [`${type}Active`]: state,
     }));
 
     try {
-      await fetch(`/api/actuator/${type}`, {
+      const res = await fetch(`/api/actuator/${type}`, {
         method: "POST",
-        body: JSON.stringify({ command: state ? "on" : "off" }),
+        body: JSON.stringify({
+          command: state ? "on" : "off",
+          garden_id: gardenId,
+        }),
         headers: {
           "Content-Type": "application/json",
         },
       });
+
+      if (!res.ok) throw new Error("Request failed");
 
       toast.success(
         `${type === "pump" ? "💧 Water" : "🌬️ Fan"} actuator ${
@@ -35,17 +44,25 @@ export const useActuatorStore = create<ActuatorState>((set) => ({
         }.`
       );
     } catch (err) {
-      console.error(`Failed to toggle ${type}:`, err);
+      console.error(`❌ Failed to toggle ${type}:`, err);
       toast.error(`❌ Failed to toggle ${type}.`);
     }
   },
 
-  fetchActuatorState: async () => {
+  fetchActuatorState: async (gardenId) => {
     try {
+      // ✅ Resolve device_id first
+      const deviceRes = await fetch(`/api/device?garden_id=${gardenId}`);
+      const { device_id } = await deviceRes.json();
+
+      if (!device_id) throw new Error("Device ID not found");
+
+      // ✅ Then fetch state using the correct device_id
       const [pumpRes, fanRes] = await Promise.all([
-        fetch("/api/actuator/pump"),
-        fetch("/api/actuator/fan"),
+        fetch(`/api/actuator/pump?device_id=${device_id}`),
+        fetch(`/api/actuator/fan?device_id=${device_id}`),
       ]);
+
       const pumpData = await pumpRes.json();
       const fanData = await fanRes.json();
 

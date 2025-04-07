@@ -12,6 +12,21 @@ export async function addSchedule({
   console.log("Calling addSchedule");
 
   const supabase = await createClient();
+
+  const { data, error_get } = getSchedules(garden_id);
+  console.log("getSchedules data:", data);
+  console.log("getSchedules error:", error_get);
+  if (error_get) {
+    throw new Error(`Error getting schedules: ${error_get.message}`);
+  }
+  
+  // Check for conflicts
+  const conflict = checkScheduleConflict(data, day, time);
+  if (conflict) {
+    console.log("Conflict found:", conflict);
+    throw new Error("Schedule conflict detected");
+  }
+
   const { error } = await supabase.rpc("add_schedule", {
     p_garden_id: garden_id,
     p_day: day,
@@ -27,6 +42,14 @@ export async function addSchedule({
   }
 }
 
+
+const checkScheduleConflict = (data, day, time) => {
+  return data.find((schedule) => {
+    return schedule.day === day && schedule.time === time;
+  });
+};
+
+
 export const getSchedules = async (gardenId) => {
   console.log("Calling getSchedules with:", gardenId);
 
@@ -41,6 +64,7 @@ export const getSchedules = async (gardenId) => {
   return { data, error };
 };
 
+
 export const removeSchedule = async (id) => {
   const supabase = await createClient();
   const { error } = await supabase.rpc("remove_schedule", {
@@ -51,39 +75,23 @@ export const removeSchedule = async (id) => {
     throw new Error(`Error removing schedule via RPC: ${error.message}`);
   }
 };
-export const updateSchedule = async (id, day, time) => {
+
+export async function updateSchedule(id, day, time, triggered, active) {
+  console.log("Calling updateSchedule with:", id, day, time, triggered, active);
   const supabase = await createClient();
   const { error } = await supabase.rpc("update_schedule", {
     p_id: id,
     p_day: day,
     p_time: time,
-  });
-
-  if (error) {
-    throw new Error(`Error updating schedule via RPC: ${error.message}`);
-  }
-}
-
-export const updateScheduleTriggered = async (id, triggered) => {
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("update_schedule_triggered", {
-    p_id: id,
     p_triggered: triggered,
-  });
-
-  if (error) {
-    throw new Error(`Error updating schedule via RPC: ${error.message}`);
-  }
-}
-
-export const updateScheduleActive = async (id, active) => {
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("update_schedule_active", {
-    p_id: id,
     p_active: active,
-  });
+  });  
 
   if (error) {
     throw new Error(`Error updating schedule via RPC: ${error.message}`);
   }
 }
+
+
+
+

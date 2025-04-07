@@ -10,7 +10,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { addSchedule } from "@/actions/gardens/schedule.actions";
+import { Edit } from "lucide-react";
+import { updateSchedule } from "@/actions/gardens/schedule.actions";
 
 const daysOfWeek = [
     "No Repeat",
@@ -23,25 +24,30 @@ const daysOfWeek = [
     "Sunday",
   ];
 
-function AddScheduleDialog({ gardenId, fetchSchedules }: { gardenId: string; fetchSchedules: () => Promise<void> }) {
-  const [scheduleDay, setScheduleDay] = useState("");
-  const [scheduleTime, setScheduleTime] = useState("");
-  const [scheduleTriggered, setScheduleTriggered] = useState(false);
-  const [scheduleActive, setScheduleActive] = useState(true);
+function UpdateScheduleDialog({ scheduleId, schedule, fetchSchedules, handleScheduleUpdate }: { 
+    scheduleId: string; 
+    schedule: { id: string; day: string; time: string; triggered?: boolean; active: boolean };
+    fetchSchedules: () => Promise<void>; 
+    handleScheduleUpdate: (id: string, day: string, time: string, triggered: boolean, active: boolean) => void 
+}) {
+  const [scheduleDay, setScheduleDay] = useState(schedule.day);
+  const [scheduleTime, setScheduleTime] = useState(schedule.time);
+  const [scheduleTriggered, setScheduleTriggered] = useState(schedule.triggered || false);
+  const [scheduleActive, setScheduleActive] = useState(schedule.active);
   const [open, setOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("Adding schedule");
+    console.log("Updating schedule");
     e.preventDefault();
-    if (!scheduleDay || !scheduleTime || !gardenId) {
+    if (!scheduleDay || !scheduleTime) {
       console.log("Invalid inputs");
       return;
     }
 
     try {
-      console.log("Adding schedule to database");
-      await addSchedule({
-        garden_id: gardenId,
+      console.log("Updating schedule to database");
+      await updateSchedule({
+        id: scheduleId,
         day: scheduleDay,
         time: scheduleTime,
         triggered: scheduleTriggered,
@@ -49,31 +55,33 @@ function AddScheduleDialog({ gardenId, fetchSchedules }: { gardenId: string; fet
       });
       fetchSchedules();
 
-      console.log("Schedule added successfully");
+      console.log("Schedule updated successfully");
 
-      toast.success("schedule added successfully!");
+      toast.success("schedule updated successfully!");
       setScheduleTime("");
       setScheduleDay("");
       setScheduleTriggered(false);
       setScheduleActive(true);
       setOpen(false);
     } catch (err) {
-      console.error("Failed to add schedule", err);
-      toast.error("Failed to add schedule.");
+      console.error("Failed to update schedule", err);
+      toast.error("Failed to update schedule.");
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="rounded-full bg-green-500 flex justify-center items-center px-4 py-2 text-xl text-white font-semibold hover:bg-green-600 transition duration-200">
-          + Add Schedule
+        <button 
+            className="text-blue-500 hover:text-blue-600"
+        >
+            <Edit size={18} />
         </button>
       </DialogTrigger>
 
       <DialogContent>
         <DialogTitle className="text-center text-2xl font-bold text-gray-800 dark:text-gray-200">
-          Add Schedule
+          Edit Schedule
         </DialogTitle>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4">
@@ -109,7 +117,7 @@ function AddScheduleDialog({ gardenId, fetchSchedules }: { gardenId: string; fet
               disabled={!scheduleDay || !scheduleTime}
               className="flex items-center justify-center h-12 px-5 rounded-full bg-green-500 text-white shadow-lg cursor-pointer hover:bg-green-600 transition duration-200"
             >
-              <h1 className="text-xl font-semibold">Add</h1>
+              <h1 className="text-xl font-semibold">Update</h1>
             </button>
           </DialogFooter>
         </form>
@@ -122,4 +130,4 @@ function AddScheduleDialog({ gardenId, fetchSchedules }: { gardenId: string; fet
   );
 }
 
-export default AddScheduleDialog;
+export default UpdateScheduleDialog;

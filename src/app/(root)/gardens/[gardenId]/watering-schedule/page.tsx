@@ -16,7 +16,7 @@ import AddScheduleDialog from "@/components/gardens/add-schedule-dialog";
 import { getSchedules } from "@/actions/gardens/schedule.actions";
 
 interface Schedule {
-  id: number;
+  id: string;
   day: string;
   time: string;
   triggered?: boolean;
@@ -26,8 +26,7 @@ interface Schedule {
 
 
 const daysOfWeek = [
-  "Today",
-  "Tomorrow",
+  "No Repeat",
   "Monday",
   "Tuesday",
   "Wednesday",
@@ -37,35 +36,24 @@ const daysOfWeek = [
   "Sunday",
 ];
 
-interface Plant {
-  plant_id: string;
-  plant_name: string;
-  description: string | null;
-  watering_days: string[];
-  watering_time: string;
-  plant_image_url?: string | null;
-  created_at: string;
-}
-
 const WateringSchedulePage = () => {
   const { gardenId } = useParams();
   const fullDate = dayjs().format("dddd, MMMM D YYYY");
   const fullTime = dayjs().format("hh:mm A");
 
   const [schedules, setSchedules] = useState<Schedule[]>([]);
-  const [newDay, setNewDay] = useState<string>("Today");
-  const [newTime, setNewTime] = useState<string>("");
 
   const fetchSchedules = async () => {
     try {
       const { data } = await getSchedules(gardenId);
       setSchedules(data);
+      console.log("all schedules:", data);
     } catch (error) {
       console.error("Error fetching schedules:", error);
     }
   };
   
-  const removeSchedule = (id: number) => {
+  const removeSchedule = (id: string) => {
     setSchedules((prev) => prev.filter((schedule) => schedule.id !== id));
   };
 
@@ -74,55 +62,36 @@ const WateringSchedulePage = () => {
     const [hour, minute] = schedule.time.split(":").map(Number);
     const scheduledTime = dayjs().hour(hour).minute(minute);
   
-    if (schedule.day === "Today") {
-      // Use today logic
+    // Treat "No Repeat", "Today", and "Tomorrow" the same
+    if (schedule.day === "No Repeat") {
       const createdDate = dayjs(schedule.created_at);
       return (
         now.isSame(createdDate, "day") &&
-        now.isSame(scheduledTime) &&
-        schedule.triggered === false
-      );
-    }
-  
-    if (schedule.day === "Tomorrow") {
-      const createdDate = dayjs(schedule.created_at);
-      const tomorrowDate = createdDate.add(1, "day");
-  
-      return (
-        now.isSame(tomorrowDate, "day") &&
-        now.isSame(scheduledTime) &&
+        now.isSame(scheduledTime, "minute") &&
         schedule.triggered === false
       );
     }
   
     return false;
   };
+  
 
   // Background checker
   useEffect(() => {
     const interval = setInterval(() => {
-      const now = dayjs();
-      const [hour, minute] = now.format("HH:mm").split(":").map(Number);
-      const currentTime = dayjs().hour(hour).minute(minute);
-      const currentDay = now.format("dddd");
-      const isToday = currentDay === "Today";
-      const isTomorrow = currentDay === "Tomorrow";
-
-
       setSchedules((prevSchedules) =>
         prevSchedules.map((schedule) => {
           if (!schedule.triggered && isScheduleTriggered(schedule)) {
             schedule.triggered = true;
             schedule.active = false;
-            return { ...schedule, triggered: true };
+            return { ...schedule, triggered: true, active: false };
           }
           return schedule;
         })
       );
-      fetchSchedules();
-    }, 60000); 
+      fetchSchedules(); // Optional, depending if schedules change externally
+    }, 60000);
     
-    console.log("all schedules:", schedules);
 
     return () => clearInterval(interval);
   }, []);
@@ -151,29 +120,6 @@ const WateringSchedulePage = () => {
             gardenId={gardenId as string}
             fetchSchedules={fetchSchedules}
           />
-          {/* <select
-            value={newDay}
-            onChange={(e) => setNewDay(e.target.value)}
-            className="p-2 mx-6 rounded-md shadow-md dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-200"
-          >
-            {daysOfWeek.map((day) => (
-              <option key={day} value={day}>
-                {day}
-              </option>
-            ))}
-          </select>
-          <input
-            type="time"
-            value={newTime}
-            onChange={(e) => setNewTime(e.target.value)}
-            className="p-2 mr-8 rounded-md shadow-md dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-200"
-          />
-          <button
-            onClick={addSchedule}
-            className="flex items-center justify-between h-12 px-5 rounded-full bg-green-500 text-white shadow-lg cursor-pointer hover:bg-green-600 transition duration-200"
-          >
-            <h1 className="text-xl font-semibold">+ Add Schedule</h1>
-          </button> */}
         </div>
       </div>
 
@@ -188,7 +134,7 @@ const WateringSchedulePage = () => {
           })
           .map((schedule) => {
             const triggered =
-              schedule.day === "Tomorrow" || schedule.day === "Today"
+              schedule.day === "No Repeat"
                 ? schedule.triggered
                 : isScheduleTriggered(schedule);
 
