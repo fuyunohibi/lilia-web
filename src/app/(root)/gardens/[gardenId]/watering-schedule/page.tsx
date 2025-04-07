@@ -47,6 +47,7 @@ const WateringSchedulePage = () => {
     try {
       const { data } = await getSchedules(gardenId);
       setSchedules(data);
+      console.log("all schedules:", data);
     } catch (error) {
       console.error("Error fetching schedules:", error);
     }
@@ -91,7 +92,6 @@ const WateringSchedulePage = () => {
       fetchSchedules(); // Optional, depending if schedules change externally
     }, 60000);
     
-    console.log("all schedules:", schedules);
 
     return () => clearInterval(interval);
   }, []);

@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { getSchedules } from "@/actions/gardens/schedule.actions";
 import { updateSchedule } from "@/actions/gardens/schedule.actions";
 import RemoveScheduleDialog from "../gardens/remove-garden-dialog";
+import UpdateScheduleDialog from "../gardens/update-schedule-dialog";
 
 interface Schedule {
     id: string;
@@ -95,18 +96,13 @@ const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }
 
                 {/* Edit and Delete buttons */}
                 <div className="flex gap-2">
-                <button 
-                    className="text-blue-500 hover:text-blue-600"
-                    onClick={() => {
-                        const newDay = prompt("Enter new day:", schedule.day);
-                        const newTime = prompt("Enter new time:", schedule.time);
-                        if (newDay && newTime) {
-                            handleScheduleUpdate(schedule.id, newDay, newTime, schedule.triggered || false, schedule.active);
-                        }
-                    }}
-                >
-                    <Edit size={18} />
-                </button>
+                <UpdateScheduleDialog
+                    scheduleId={schedule.id}
+                    schedule={schedule}
+                    fetchSchedules={fetchSchedules}
+                    handleScheduleUpdate={handleScheduleUpdate}
+                />
+
                 <RemoveScheduleDialog
                     scheduleId={schedule.id}
                     fetchSchedules={fetchSchedules}
