@@ -6,18 +6,17 @@ import ActuatorCard from "../cards/actuator-card";
 import SensorCard from "../cards/sensor-card";
 import WaterCard from "../cards/water-card";
 import SensorSmallCard from "../cards/sensor-card-small";
-
+import useAlertWebSocket from "@/hooks/useAlertWebSocket";
 
 interface DashboardProps {
   gardenId: string;
 }
 
 const Dashboard = ({ gardenId }: DashboardProps) => {
-  const { pumpActive, fanActive, toggleActuator, fetchActuatorState } =
-    useActuatorStore();
-
+  const { pumpActive, fanActive, toggleActuator, fetchActuatorState } = useActuatorStore();
   const [sensorData, setSensorData] = useState<any>(null);
   const [moistureHistory, setMoistureHistory] = useState<any[]>([]);
+  useAlertWebSocket(gardenId);
 
   const fetchSensorData = async () => {
     if (!gardenId) return;

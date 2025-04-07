@@ -7,17 +7,12 @@ import {
 } from "@/components/ui/popover";
 import { Bell } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useNotificationStore } from "@/stores/notification-store";
 
-const notifications = [
-  "⚠️ Low temperature detected in Tomato Bed (14°C)",
-  "🚫 No water detected in Herb Garden reservoir",
-  "🔔 Scheduled watering completed for Rose Patch",
-  "✅ Fan successfully activated in Greenhouse Zone 1",
-  "💡 Light levels are below optimal in Lettuce Tray (120 lx)",
-  "📦 New sensor data synced from Raspberry Pi controller",
-];
 
 export function NotificationBell() {
+  const notifications = useNotificationStore((state) => state.alerts);
+
   return (
     <div className="absolute top-3 right-16 md:top-4 md:right-4 z-50">
       <Popover>
@@ -41,20 +36,21 @@ export function NotificationBell() {
             🔔 Notifications
           </div>
           <ScrollArea className="h-60">
-            {notifications.length === 0 ? (
-              <div className="text-neutral-500 italic text-sm">
-                No new notifications.
-              </div>
-            ) : (
-              notifications.map((note, index) => (
-                <div
-                  key={index}
-                  className="bg-white/40 dark:bg-neutral-700/40 rounded-xl px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200 shadow-sm backdrop-blur-md mb-2"
-                >
-                  {note}
-                </div>
-              ))
-            )}
+          {notifications.length === 0 ? (
+          <div className="text-neutral-500 italic text-sm">
+            No new notifications.
+          </div>
+        ) : (
+          notifications.map((note, index) => (
+            <div
+              key={index}
+              className="bg-white/40 dark:bg-neutral-700/40 rounded-xl px-4 py-3 text-sm text-neutral-800 dark:text-neutral-200 shadow-sm backdrop-blur-md mb-2"
+            >
+              <span className="font-semibold">{note.sensor.toUpperCase()}:</span>{" "}
+              {note.message}
+            </div>
+          ))
+        )}
           </ScrollArea>
         </PopoverContent>
       </Popover>
