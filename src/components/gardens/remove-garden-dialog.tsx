@@ -15,9 +15,9 @@ import { Trash } from "lucide-react";
 
 
 function RemoveScheduleDialog({ scheduleId, fetchSchedules, setSchedules }: { 
-    scheduleId: number; 
+    scheduleId: string; 
     fetchSchedules: () => Promise<void>; 
-    removeSchedule: (id: number) => void;
+    removeSchedule: (id: string) => void;
     setSchedules: React.Dispatch<React.SetStateAction<any[]>>;
 
  }) {
@@ -25,7 +25,7 @@ function RemoveScheduleDialog({ scheduleId, fetchSchedules, setSchedules }: {
   const [scheduleTime, setScheduleTime] = useState("");
   const [open, setOpen] = useState(false);
 
-  const handleScheduleDelete = async (id: number) => {
+  const handleScheduleDelete = async (id: string) => {
     try {
         await removeSchedule(id);
         setSchedules((prev) => prev.filter((s) => s.id !== id));

@@ -12,7 +12,7 @@ import { updateSchedule } from "@/actions/gardens/schedule.actions";
 import RemoveScheduleDialog from "../gardens/remove-garden-dialog";
 
 interface Schedule {
-    id: number;
+    id: string;
     day: string;
     time: string;
     triggered?: boolean;
@@ -23,13 +23,13 @@ interface Schedule {
 interface ScheduleCardProps {
     fetchSchedules: () => Promise<void>;
     schedule: Schedule;
-    removeSchedule: (id: number) => void;
+    removeSchedule: (id: string) => void;
     setSchedules: React.Dispatch<React.SetStateAction<Schedule[]>>;
 }
 
 const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }: ScheduleCardProps) => {
 
-    const handleScheduleUpdate = async (id: number, day: string, time: string, triggered: boolean, active: boolean) => {
+    const handleScheduleUpdate = async (id: string, day: string, time: string, triggered: boolean, active: boolean) => {
         const created_at = new Date().toISOString();
         try {
             await updateSchedule({id, day, time, triggered, active});
@@ -43,7 +43,7 @@ const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }
     };
 
     
-    const handleSwitchChange = (id: number, active: boolean) => {
+    const handleSwitchChange = (id: string, active: boolean) => {
         console.log("Switch changed to:", id, active);
         setSchedules((prev) =>
             prev.map((s) => (s.id === id ? { ...s, active } : s))
@@ -83,13 +83,13 @@ const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }
                     transition={{ delay: 0.2, duration: 0.5 }}
                 >
                     <Switch
-                    checked={schedule.active}
-                    onCheckedChange={() => {
-                        handleSwitchChange(schedule.id, !schedule.active);
-                    }}
-                    className={`${
-                        schedule.active} ? "bg-green-500" : "bg-gray-700"
-                    } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
+                        checked={schedule.active}
+                        onCheckedChange={() => {
+                            handleSwitchChange(schedule.id, !schedule.active);
+                        }}
+                        className={`${
+                            schedule.active} ? "bg-green-500" : "bg-gray-700"
+                        } relative inline-flex h-6 w-11 items-center rounded-full transition-colors`}
                     />
                 </motion.div>
 

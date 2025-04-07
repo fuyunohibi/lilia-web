@@ -16,7 +16,7 @@ import AddScheduleDialog from "@/components/gardens/add-schedule-dialog";
 import { getSchedules } from "@/actions/gardens/schedule.actions";
 
 interface Schedule {
-  id: number;
+  id: string;
   day: string;
   time: string;
   triggered?: boolean;
@@ -52,7 +52,7 @@ const WateringSchedulePage = () => {
     }
   };
   
-  const removeSchedule = (id: number) => {
+  const removeSchedule = (id: string) => {
     setSchedules((prev) => prev.filter((schedule) => schedule.id !== id));
   };
 
