@@ -2,22 +2,25 @@
 
 import { createClient } from "@/utils/supabase/server";
 
-export async function addSchedule({
+export async function addSchedule(
   garden_id,
   day,
   time,
   triggered,
   active
-}) {
+) {
   console.log("Calling addSchedule");
 
   const supabase = await createClient();
 
-  const { data, error_get } = getSchedules(garden_id);
+  const { data, error: error_get } = await getSchedules(garden_id);
   console.log("getSchedules data:", data);
   console.log("getSchedules error:", error_get);
   if (error_get) {
     throw new Error(`Error getting schedules: ${error_get.message}`);
+  }
+  if (!data) {
+    throw new Error("No schedules found from addSchedules");
   }
   
   // Check for conflicts
@@ -44,7 +47,7 @@ export async function addSchedule({
 
 
 const checkScheduleConflict = (data, day, time) => {
-  return data.find((schedule) => {
+  return Object.values(data).find((schedule) => {
     return schedule.day === day && schedule.time === time;
   });
 };
@@ -58,8 +61,7 @@ export const getSchedules = async (gardenId) => {
     p_garden_id: gardenId,
   });
 
-  console.log("RPC data:", data);
-  console.log("RPC error:", error);
+  console.log("RPC data from getSchedule:", data);
 
   return { data, error };
 };
@@ -91,7 +93,3 @@ export async function updateSchedule(id, day, time, triggered, active) {
     throw new Error(`Error updating schedule via RPC: ${error.message}`);
   }
 }
-
-
-
-

@@ -40,14 +40,13 @@ function AddScheduleDialog({ gardenId, fetchSchedules }: { gardenId: string; fet
 
     try {
       console.log("Adding schedule to database");
-      await addSchedule({
-        garden_id: gardenId,
-        day: scheduleDay,
-        time: scheduleTime,
-        triggered: scheduleTriggered,
-        active: scheduleActive,
-      });
-      fetchSchedules();
+      await addSchedule(
+        gardenId,
+        scheduleDay,
+        scheduleTime,
+        scheduleTriggered,
+        scheduleActive
+      );
 
       console.log("Schedule added successfully");
 
@@ -57,6 +56,8 @@ function AddScheduleDialog({ gardenId, fetchSchedules }: { gardenId: string; fet
       setScheduleTriggered(false);
       setScheduleActive(true);
       setOpen(false);
+      
+      fetchSchedules();
     } catch (err) {
       console.error("Failed to add schedule", err);
       toast.error("Failed to add schedule.");
