@@ -14,6 +14,7 @@ import PageWrapper from "@/components/layout.tsx/page-content";
 import { UserTooltip } from "@/components/ui/user-tooltip";
 import AddTeamDialog from "@/components/teams/add-team-dialog";
 import { useRouter } from "next/navigation";
+import EditTeamDialog from "@/components/teams/edit-team-dialog";
 
 const TeamPage = () => {
   const router = useRouter();
@@ -141,18 +142,19 @@ const TeamPage = () => {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => toggleExpand(team.team_id)}
-                    className="group flex items-center justify-between mt-6 text-sm text-neutral-700 dark:text-neutral-300 hover:underline w-full"
-                  >
-                    <span>View Gardens</span>
-                    <IconChevronDown
-                      className={cn(
-                        "h-5 w-5 transform transition-transform duration-200",
-                        isExpanded ? "rotate-180" : "rotate-0"
-                      )}
+                  <div className="flex justify-between items-center mt-4">
+                    <button
+                      onClick={() => toggleExpand(team.team_id)}
+                      className="group flex items-center justify-between text-sm text-neutral-700 dark:text-neutral-300 hover:underline w-full"
+                    >
+                      <span>View Gardens</span>
+                    </button>
+                    <EditTeamDialog
+                      currentUser={currentUser}
+                      team={team}
+                      onTeamUpdated={loadTeamsAndMembers}
                     />
-                  </button>
+                  </div>
                 </div>
 
                 <AnimatePresence>
@@ -177,7 +179,7 @@ const TeamPage = () => {
                       ) : (
                         <div className="flex flex-col gap-3">
                           {gardens.map((g: any, idx: number) => (
-                            <button 
+                            <button
                               key={g.garden_id ?? idx}
                               onClick={() => router.push("/gardens")}
                               className="cursor-pointer rounded-lg border border-neutral-200 dark:border-neutral-700 p-3 bg-green-600 dark:bg-neutral-900"

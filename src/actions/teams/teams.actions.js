@@ -71,3 +71,37 @@ export async function getTeamGardens(teamId) {
 
   return { data };
 }
+
+export async function updateTeam({ teamId, teamName, members }) {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("update_team", {
+    p_team_id: teamId,
+    p_team_name: teamName,
+    p_members: members,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return true;
+}
+
+export async function removeTeamMember({
+  teamId,
+  memberId,
+}) {
+  const supabase = await createClient();
+
+  const { error } = await supabase.rpc("remove_team_member", {
+    p_team_id: teamId,
+    p_member_id: memberId,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return true;
+}
