@@ -69,14 +69,16 @@ export async function updateGarden({
   device_id,
   is_default,
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
+
+  const safeDeviceId = device_id && device_id.trim() !== "" ? device_id : null;
 
   const { error } = await supabase.rpc("update_garden", {
     p_garden_id: garden_id,
     p_team_id: team_id,
     p_garden_name: garden_name,
     p_garden_location: garden_location,
-    p_device_id: device_id,
+    p_device_id: safeDeviceId, 
     p_is_default: is_default,
   });
 
