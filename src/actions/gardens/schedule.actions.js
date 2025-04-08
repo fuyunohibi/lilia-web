@@ -79,7 +79,6 @@ export const removeSchedule = async (id) => {
 };
 
 export async function updateSchedule(id, day, time, triggered, active) {
-  console.log("Calling updateSchedule with:", id, day, time, triggered, active);
   const supabase = await createClient();
   const { error } = await supabase.rpc("update_schedule", {
     p_id: id,
