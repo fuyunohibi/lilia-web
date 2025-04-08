@@ -27,6 +27,14 @@ interface ActuatorCardProps {
   onToggle: (state: boolean) => void;
 }
 
+const formatValue = (value: number, type: string) => {
+    if (type === "temperature" || type === "humidity" || type === "light") {
+      return value.toFixed(2);
+    } else if (type === "soil moisture") {
+      return value.toFixed(1); 
+    }
+    return value.toString();
+  };
 
 const SensorSmallCard: React.FC<SensorCardProps> = ({ data, history }) => {
     if (!data || !history.length) return null;
@@ -82,7 +90,15 @@ const SensorSmallCard: React.FC<SensorCardProps> = ({ data, history }) => {
                 {/* Value */}
                 <div className="flex items-center col-span-5 mt-2">
                     <span className="text-xl font-semibold text-muted-foreground">
-                        {sensor === "temperature" ? `${data.temperature}°C` : sensor === "humidity" ? `${data.humidity}%` : sensor === "light" ? `${data.light}` : sensor === "soil moisture" ? `${averageMoisture}%` : sensor.charAt(0).toUpperCase() + sensor.slice(1)}
+                        {sensor === "temperature"
+                        ? `${formatValue(data.temperature, "temperature")}°C`
+                        : sensor === "humidity"
+                        ? `${formatValue(data.humidity, "humidity")}%`
+                        : sensor === "light"
+                        ? `${formatValue(data.light, "light")}`
+                        : sensor === "soil moisture"
+                        ? `${averageMoisture}%`
+                        : sensor.charAt(0).toUpperCase() + sensor.slice(1)}
                     </span>
                 </div>
             </motion.div>

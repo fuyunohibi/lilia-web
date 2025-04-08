@@ -8,6 +8,8 @@ import WaterCard from "../cards/water-card";
 import SensorSmallCard from "../cards/sensor-card-small";
 import useAlertWebSocket from "@/hooks/useAlertWebSocket";
 import LiveCamCard from "../cards/live-cam-card";
+import { getSensorDataByGardenId } from "@/actions/sensors/sensor.actions";
+
 
 interface DashboardProps {
   gardenId: string;
@@ -22,9 +24,8 @@ const Dashboard = ({ gardenId }: DashboardProps) => {
   const fetchSensorData = async () => {
     if (!gardenId) return;
     try {
-      const res = await fetch(`/api/sensor?garden_id=${gardenId}`);
-      const json = await res.json();
-      const latest = json.data;
+      const { data } = await getSensorDataByGardenId(gardenId);
+      const latest = data[0];  // Because we're getting the most recent entry
       setSensorData(latest);
 
       setMoistureHistory((prev) => {
@@ -44,7 +45,7 @@ const Dashboard = ({ gardenId }: DashboardProps) => {
     fetchActuatorState(gardenId);
     fetchSensorData();
   
-    const interval = setInterval(fetchSensorData, 5000);
+    const interval = setInterval(fetchSensorData, 5000); // every 5 seconds
     return () => clearInterval(interval);
   }, [gardenId]);
   

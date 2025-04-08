@@ -18,6 +18,7 @@ import {
   ChartTooltipContent,
 } from "@/components/charts/chart";
 import PageWrapper from "@/components/layout.tsx/page-content";
+import { getGardenAnalytics } from "@/actions/analytics/analytics.action";
 
 interface ChartDataPoint {
   time: string;
@@ -56,16 +57,20 @@ const AnalyticsPage = () => {
     const fetchData = async () => {
       if (!selectedGardenId) return;
       try {
-        const res = await fetch(`/api/analytics?garden_id=${selectedGardenId}`);
-        const json = await res.json();
-    
-        if (!Array.isArray(json.data)) {
-          console.error("Unexpected data format:", json);
+        const { data, error } = await getGardenAnalytics(selectedGardenId);
+  
+        if (error) {
+          console.error("Error fetching analytics data:", error);
           return;
         }
-    
-        const formatted = json.data.map((item: any) => ({
-          time: new Date(item.timestamp).toLocaleTimeString([], {
+  
+        if (!data || data.length === 0) {
+          console.warn("No analytics data found");
+          return;
+        }
+  
+        const formatted = data.map((item: any) => ({
+          time: new Date(item.hour).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
           }),
@@ -74,19 +79,19 @@ const AnalyticsPage = () => {
           soil_water_deficit_estimation: item.soil_water_deficit_estimation,
           plant_heat_stress: item.plant_heat_stress,
         }));
-    
+  
         setData(formatted);
-        setUpdatedTime(new Date().toLocaleTimeString()); // ✅ Update this on each fetch
+        setUpdatedTime(new Date().toLocaleTimeString());
       } catch (err) {
-        console.error("Failed to fetch sensor data:", err);
+        console.error("Failed to fetch analytics data:", err);
       }
     };
-    
   
     fetchData();
     const interval = setInterval(fetchData, 60 * 60 * 1000); // every hour
     return () => clearInterval(interval);
   }, [selectedGardenId]);
+  
 
   // useEffect(() => {
   //   console.log("📍 selectedGardenId:", selectedGardenId); // check if it's defined

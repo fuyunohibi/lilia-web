@@ -39,3 +39,18 @@ export const getGardenSensors = async (gardenId: string) => {
 
   return { data, error };
 };
+
+export const getSensorDataByGardenId = async (gardenId: string) => {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("get_garden_sensor_data", {
+    p_garden_id: gardenId,
+  });
+
+  if (error) {
+    console.error("❌ Supabase RPC error:", error.message);
+    return { data: null, error };
+  }
+
+  return { data, error: null };
+};
