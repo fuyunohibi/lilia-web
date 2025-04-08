@@ -43,6 +43,8 @@ export async function addSchedule(
   if (error) {
     throw new Error(`Error adding schedule via RPC: ${error.message}`);
   }
+
+  return { success: true };
 }
 
 
@@ -76,6 +78,8 @@ export const removeSchedule = async (id) => {
   if (error) {
     throw new Error(`Error removing schedule via RPC: ${error.message}`);
   }
+
+  return { success: true };
 };
 
 export async function updateSchedule(id, day, time, triggered, active) {
