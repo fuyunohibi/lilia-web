@@ -46,13 +46,13 @@ function UpdateScheduleDialog({ scheduleId, schedule, fetchSchedules, handleSche
 
     try {
       console.log("Updating schedule to database");
-      await updateSchedule({
-        id: scheduleId,
-        day: scheduleDay,
-        time: scheduleTime,
-        triggered: scheduleTriggered,
-        active: scheduleActive,
-      });
+      handleScheduleUpdate(
+        scheduleId,
+        scheduleDay,
+        scheduleTime,
+        scheduleTriggered,
+        scheduleActive
+      );
       fetchSchedules();
 
       console.log("Schedule updated successfully");

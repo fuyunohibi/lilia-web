@@ -54,7 +54,10 @@ const WateringSchedulePage = () => {
   };
   
   const removeSchedule = (id: string) => {
-    setSchedules((prev) => prev.filter((schedule) => schedule.id !== id));
+    setSchedules((prev) => {
+      const updatedSchedules = prev.filter((schedule) => schedule.id !== id);
+      return updatedSchedules; 
+    });
   };
 
   const isScheduleTriggered = (schedule: Schedule): boolean => {
@@ -89,7 +92,7 @@ const WateringSchedulePage = () => {
           return schedule;
         })
       );
-      fetchSchedules(); // Optional, depending if schedules change externally
+      fetchSchedules();
     }, 60000);
     
 
@@ -133,10 +136,6 @@ const WateringSchedulePage = () => {
             return aHour !== bHour ? aHour - bHour : aMinute - bMinute;
           })
           .map((schedule) => {
-            const triggered =
-              schedule.day === "No Repeat"
-                ? schedule.triggered
-                : isScheduleTriggered(schedule);
 
             return (
               <div

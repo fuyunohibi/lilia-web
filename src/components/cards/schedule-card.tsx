@@ -33,7 +33,7 @@ const ScheduleCard = ({ fetchSchedules, schedule, removeSchedule, setSchedules }
     const handleScheduleUpdate = async (id: string, day: string, time: string, triggered: boolean, active: boolean) => {
         const created_at = new Date().toISOString();
         try {
-            await updateSchedule({id, day, time, triggered, active});
+            await updateSchedule(id, day, time, triggered, active);
             setSchedules((prev) =>
                 prev.map((s) => (s.id === id ? { ...s, day, time, triggered, active, created_at} : s))
             );

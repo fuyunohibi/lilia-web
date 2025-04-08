@@ -19,6 +19,8 @@ import Dashboard from "@/components/ui/dashboard";
 import Image from "next/image";
 import { getPlants } from "@/actions/plants/plants.actions";
 import { NotificationBell } from "@/components/notifications/notification-bell";
+import LiveCamCard from "@/components/cards/live-cam-card";
+
 
 
 interface Team {

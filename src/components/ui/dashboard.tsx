@@ -7,6 +7,7 @@ import SensorCard from "../cards/sensor-card";
 import WaterCard from "../cards/water-card";
 import SensorSmallCard from "../cards/sensor-card-small";
 import useAlertWebSocket from "@/hooks/useAlertWebSocket";
+import LiveCamCard from "../cards/live-cam-card";
 
 interface DashboardProps {
   gardenId: string;
@@ -51,14 +52,14 @@ const Dashboard = ({ gardenId }: DashboardProps) => {
   return (
     <div className="flex flex-1">
       <div className="flex flex-col gap-6 flex-1 w-full h-full rounded-3xl">
-        <div className="grid grid-cols-4 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-4 md:grid-cols-4 gap-6 h-full">
           <div className="grid grid-cols-3 col-start-1 col-end-4 gap-6">
             <SensorSmallCard
               data={sensorData}
               history={moistureHistory}
             />
           </div>
-          <div className="grid grid-rows-3 col-start-4 col-end-5 row-span-2 h-120 gap-6">
+          <div className="grid grid-rows-3 col-start-4 col-end-6 row-span-15 gap-6">
             <WaterCard liquid_detected={sensorData?.liquid_detected} />
             <ActuatorCard
               title="Water Pump"
@@ -74,6 +75,13 @@ const Dashboard = ({ gardenId }: DashboardProps) => {
               backgroundImage="https://m.media-amazon.com/images/I/810r2WWqGoL._AC_UF894,1000_QL80_.jpg"
               isActive={fanActive}
               onToggle={(state) => toggleActuator("fan", state, gardenId)}
+            />
+          </div>
+          <div className="row-span-14 col-span-3 gap-6">
+            <LiveCamCard
+              title="🌿 Garden Live Cam"
+              description="Watch your plants sway in real time"
+              videoSrc="http://100.84.67.85:5000"
             />
           </div>
           {/* <SensorCard data={sensorData} history={moistureHistory} /> */}
