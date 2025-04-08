@@ -7,7 +7,9 @@ export async function addSchedule(
   day,
   time,
   triggered,
-  active
+  active,
+  duration,
+  min_moisture
 ) {
   console.log("Calling addSchedule");
 
@@ -22,7 +24,7 @@ export async function addSchedule(
   if (!data) {
     throw new Error("No schedules found from addSchedules");
   }
-  
+
   // Check for conflicts
   const conflict = checkScheduleConflict(data, day, time);
   if (conflict) {
@@ -36,8 +38,10 @@ export async function addSchedule(
     p_time: time,
     p_triggered: triggered,
     p_active: active,
+    p_duration: duration,
+    p_min_moisture: min_moisture,
   });
-  
+
   console.log("RPC response error:", error);
 
   if (error) {
@@ -82,17 +86,46 @@ export const removeSchedule = async (id) => {
   return { success: true };
 };
 
-export async function updateSchedule(id, day, time, triggered, active) {
+export async function updateSchedule(
+  id,
+  day,
+  time,
+  triggered,
+  active,
+  duration,
+  min_moisture,
+  gardenId
+) {
   const supabase = await createClient();
+
+
+  const { data: existing, error: fetchError } = await supabase
+    .from("schedules")
+    .select("day, time, duration")
+    .eq("id", id)
+    .single();
+
+  if (fetchError) {
+    throw new Error(`Failed to fetch existing schedule: ${fetchError.message}`);
+  }
+
+  const shouldResetTriggered =
+    existing.day !== day || existing.time !== time || existing.duration !== duration;
+
   const { error } = await supabase.rpc("update_schedule", {
     p_id: id,
     p_day: day,
     p_time: time,
-    p_triggered: triggered,
+    p_triggered: shouldResetTriggered ? false : triggered,
     p_active: active,
-  });  
+    p_duration: duration,
+    p_min_moisture: min_moisture,
+  });
 
   if (error) {
     throw new Error(`Error updating schedule via RPC: ${error.message}`);
   }
+
+  return { success: true };
 }
+

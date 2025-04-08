@@ -141,12 +141,12 @@ const WateringSchedulePage = () => {
               <div
                 key={schedule.id}
               >
-                {ScheduleCard({
-                  fetchSchedules,
-                  schedule,
-                  removeSchedule,
-                  setSchedules,
-                })}
+              <ScheduleCard
+                fetchSchedules={fetchSchedules}
+                schedule={schedule}
+                setSchedules={setSchedules}
+                gardenId={gardenId as string}
+              />
               </div>
             );
           })

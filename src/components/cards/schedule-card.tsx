@@ -19,34 +19,38 @@ interface Schedule {
   triggered?: boolean;
   active: boolean;
   created_at: string;
+  duration?: number;
+  min_moisture?: number;
 }
 
 interface ScheduleCardProps {
   fetchSchedules: () => Promise<void>;
   schedule: Schedule;
-  removeSchedule: (id: string) => void;
   setSchedules: React.Dispatch<React.SetStateAction<Schedule[]>>;
+  gardenId: string;
 }
 
 const ScheduleCard = ({
   fetchSchedules,
   schedule,
-  removeSchedule,
   setSchedules,
+  gardenId
 }: ScheduleCardProps) => {
   const handleScheduleUpdate = async (
     id: string,
     day: string,
     time: string,
     triggered: boolean,
-    active: boolean
+    active: boolean,
+    duration?: number,
+    min_moisture?: number
   ) => {
     const created_at = new Date().toISOString();
     try {
-      await updateSchedule(id, day, time, triggered, active);
+      await updateSchedule(id, day, time, triggered, active, duration, min_moisture, gardenId);
       setSchedules((prev) =>
         prev.map((s) =>
-          s.id === id ? { ...s, day, time, triggered, active, created_at } : s
+          s.id === id ? { ...s, day, time, triggered, active, duration, min_moisture, created_at } : s
         )
       );
       fetchSchedules();
@@ -60,7 +64,7 @@ const ScheduleCard = ({
     setSchedules((prev) =>
       prev.map((s) => (s.id === id ? { ...s, active } : s))
     );
-    handleScheduleUpdate(id, schedule.day, schedule.time, false, active);
+    handleScheduleUpdate(id, schedule.day, schedule.time, false, active, schedule.duration, schedule.min_moisture);
     fetchSchedules();
   };
 
@@ -111,7 +115,6 @@ const ScheduleCard = ({
           <RemoveScheduleDialog
             scheduleId={schedule.id}
             fetchSchedules={fetchSchedules}
-            removeSchedule={removeSchedule}
             setSchedules={setSchedules}
           />
         </div>

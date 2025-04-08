@@ -44,14 +44,16 @@ const SensorSmallCard: React.FC<SensorCardProps> = ({ data, history }) => {
         2
     ).toFixed(1);
 
-    const chartData = history.map((entry) => ({
-        time: new Date(entry.timestamp).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        }),
-        moisture1: entry.soil_moisture1,
-        moisture2: entry.soil_moisture2,
-    }));
+    const chartData = history
+        .filter((entry): entry is SensorData => entry !== undefined && entry !== null)
+        .map((entry) => ({
+            time: new Date(entry.timestamp).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+            }),
+            moisture1: entry.soil_moisture1,
+            moisture2: entry.soil_moisture2,
+        }));
 
     const sensorList = ["temperature", "humidity", "light", "soil moisture"];
 

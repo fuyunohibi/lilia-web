@@ -29,6 +29,8 @@ function AddScheduleDialog({ gardenId, fetchSchedules }: { gardenId: string; fet
   const [scheduleTriggered, setScheduleTriggered] = useState(false);
   const [scheduleActive, setScheduleActive] = useState(true);
   const [open, setOpen] = useState(false);
+  const [duration, setDuration] = useState(30); // default 30 seconds
+  const [minMoisture, setMinMoisture] = useState(20); // default 20%
 
   const handleSubmit = async (e: React.FormEvent) => {
     console.log("Adding schedule");
@@ -45,7 +47,9 @@ function AddScheduleDialog({ gardenId, fetchSchedules }: { gardenId: string; fet
         scheduleDay,
         scheduleTime,
         scheduleTriggered,
-        scheduleActive
+        scheduleActive,
+        duration,
+        minMoisture
       );
 
       console.log("Schedule added successfully");
@@ -78,6 +82,7 @@ function AddScheduleDialog({ gardenId, fetchSchedules }: { gardenId: string; fet
         </DialogTitle>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4">
+        
           <select
             value={scheduleDay}
             onChange={(e) => setScheduleDay(e.target.value)}
@@ -95,7 +100,39 @@ function AddScheduleDialog({ gardenId, fetchSchedules }: { gardenId: string; fet
             onChange={(e) => setScheduleTime(e.target.value)}
             className="p-2 mx-auto rounded-md shadow-md dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-200 w-3/4"
           />
-    
+
+          {/* add duration and min moisutre */}
+          <div className="flex flex-col items-center">
+            <div>
+              Duration(seconds)
+            </div>
+            <input
+              type="number"
+              min={1}
+              placeholder="Duration (seconds)"
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value))}
+              className="p-2 mx-auto rounded-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-200 w-3/4"
+            />
+          </div>
+
+
+          <div className="flex flex-col items-center">
+            <div>
+              Min Moisture (%)
+            </div>
+            <input
+              type="number"
+              min={0}
+              max={100}
+              placeholder="Min Moisture (%)"
+              value={minMoisture}
+              onChange={(e) => setMinMoisture(Number(e.target.value))}
+              className="p-2 mx-auto rounded-md bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-200 w-3/4"
+            />
+          </div>
+
+
           <DialogFooter className="mt-4 mx-auto gap-8">
             <button
               type="button"
