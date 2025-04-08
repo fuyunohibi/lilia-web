@@ -25,6 +25,7 @@ import { PlantDetailsDialog } from "@/components/plants/plant-details-dialog";
 import Image from "next/image";
 import { getPlants } from "@/actions/plants/plants.actions";
 import EditDefaultGardenDialog from "@/components/gardens/edit-default-garden-dialog";
+import EditGardenDialog from "@/components/gardens/edit-garden-dialog";
 
 
 const GardenPage = () => {
@@ -104,6 +105,12 @@ const GardenPage = () => {
 
     setExpandedGarden(gardenId);
   };
+
+  const refreshGardens = async () => {
+    const { data } = await getTeamGardens(selectedTeamId);
+    setGardens(data || []);
+  };
+
 
   return (
     <PageWrapper>
@@ -206,18 +213,19 @@ const GardenPage = () => {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => toggleExpand(garden.garden_id)}
-                  className="group flex items-center justify-between mt-6 text-sm text-neutral-700 dark:text-neutral-300 hover:underline w-full"
-                >
-                  <span>View Details</span>
-                  <IconChevronDown
-                    className={cn(
-                      "h-5 w-5 transform transition-transform duration-200",
-                      isExpanded ? "rotate-180" : "rotate-0"
-                    )}
+                <div className="flex justify-between items-center mt-4">
+                  <button
+                    onClick={() => toggleExpand(garden.garden_id)}
+                    className="group flex items-center justify-between mt-6 text-sm text-neutral-700 dark:text-neutral-300 hover:underline w-full"
+                  >
+                    <span>View Details</span>
+                  </button>
+                  <EditGardenDialog
+                    teamId={selectedTeamId}
+                    garden={garden}
+                    onGardenUpdated={refreshGardens}
                   />
-                </button>
+                </div>
 
                 <AnimatePresence>
                   {isExpanded && (
