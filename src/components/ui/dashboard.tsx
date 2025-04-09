@@ -25,7 +25,7 @@ const Dashboard = ({ gardenId }: DashboardProps) => {
     if (!gardenId) return;
     try {
       const { data } = await getSensorDataByGardenId(gardenId);
-      const latest = data[0];  // Because we're getting the most recent entry
+      const latest = data[0]; 
       setSensorData(latest);
 
       setMoistureHistory((prev) => {

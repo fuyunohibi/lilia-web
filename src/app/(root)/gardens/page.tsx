@@ -209,7 +209,7 @@ const GardenPage = () => {
 
                   <div className="flex gap-2">
                     <AddPlantDialog gardenId={garden.garden_id} />
-                    <AddSensorDialog gardenId={garden.garden_id} />
+                    {/* <AddSensorDialog gardenId={garden.garden_id} /> */}
                   </div>
                 </div>
 

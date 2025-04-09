@@ -6,7 +6,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-// Example POST to get device_id from garden_id
 export async function POST(req: NextRequest) {
   try {
     const { garden_id } = await req.json();
