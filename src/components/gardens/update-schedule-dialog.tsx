@@ -28,7 +28,15 @@ function UpdateScheduleDialog({ scheduleId, schedule, fetchSchedules, handleSche
     scheduleId: string; 
     schedule: { id: string; day: string; time: string; triggered?: boolean; active: boolean };
     fetchSchedules: () => Promise<void>; 
-    handleScheduleUpdate: (id: string, day: string, time: string, triggered: boolean, active: boolean) => void 
+    handleScheduleUpdate: (
+      id: string,
+      day: string,
+      time: string,
+      triggered: boolean,
+      active: boolean,
+      duration?: number,
+      min_moisture?: number
+    ) => Promise<void>;
 }) {
   const [scheduleDay, setScheduleDay] = useState(schedule.day);
   const [scheduleTime, setScheduleTime] = useState(schedule.time);

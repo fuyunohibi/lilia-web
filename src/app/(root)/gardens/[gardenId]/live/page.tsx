@@ -6,6 +6,7 @@ import { useGardenStore } from "@/app/api/stores/garden-store";
 import PageWrapper from "@/components/layout.tsx/page-content";
 import LiveCamCard from "@/components/cards/live-cam-card";
 
+
 const LiveCamPage = () => {
   const { selectedGardenId } = useGardenStore(); // ✅ Get gardenId from Zustand
   const { toggleActuator, fetchActuatorState, pumpActive, fanActive } =

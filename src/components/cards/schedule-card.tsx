@@ -28,15 +28,7 @@ interface ScheduleCardProps {
   schedule: Schedule;
   setSchedules: React.Dispatch<React.SetStateAction<Schedule[]>>;
   gardenId: string;
-}
-
-const ScheduleCard = ({
-  fetchSchedules,
-  schedule,
-  setSchedules,
-  gardenId
-}: ScheduleCardProps) => {
-  const handleScheduleUpdate = async (
+  handleScheduleUpdate: (
     id: string,
     day: string,
     time: string,
@@ -44,29 +36,27 @@ const ScheduleCard = ({
     active: boolean,
     duration?: number,
     min_moisture?: number
-  ) => {
-    const created_at = new Date().toISOString();
-    try {
-      await updateSchedule(id, day, time, triggered, active, duration, min_moisture, gardenId);
-      setSchedules((prev) =>
-        prev.map((s) =>
-          s.id === id ? { ...s, day, time, triggered, active, duration, min_moisture, created_at } : s
-        )
-      );
-      fetchSchedules();
-    } catch (error) {
-      console.error("Error updating schedule:", error);
-    }
-  };
+  ) => Promise<void>;
+}
+
+const ScheduleCard = ({
+  fetchSchedules,
+  schedule,
+  setSchedules,
+  gardenId,
+  handleScheduleUpdate,
+}: ScheduleCardProps) => {
 
   const handleSwitchChange = (id: string, active: boolean) => {
-    console.log("Switch changed to:", id, active);
+    // console.log("Switch changed to:", id, active);
     setSchedules((prev) =>
       prev.map((s) => (s.id === id ? { ...s, active } : s))
     );
     handleScheduleUpdate(id, schedule.day, schedule.time, false, active, schedule.duration, schedule.min_moisture);
     fetchSchedules();
   };
+
+  
 
   return (
     <motion.div className="flex min-w-60 min-h-32 m-2 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
