@@ -75,10 +75,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GET_actuator, POST_actuator } from '../route';
 
-export async function POST(request: NextRequest, actuator_type: string) {
-  return POST_actuator(request, actuator_type);
+export async function POST(request: NextRequest) {
+  return POST_actuator(request, 'pump');
 }
 
-export async function GET(request: NextRequest, actuator_type: string) {
-  return GET_actuator(request, actuator_type);
+export async function GET(request: NextRequest) {
+  return GET_actuator(request, 'pump');
 }
