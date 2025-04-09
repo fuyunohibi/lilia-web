@@ -30,7 +30,7 @@ function AddPlantDialog({ gardenId }: { gardenId: string }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!gardenId || !plantName || wateringDays.length === 0 || !wateringTime) {
+    if (!gardenId || !plantName ) {
       toast.error("Please fill all required fields");
       return;
     }
@@ -95,41 +95,6 @@ function AddPlantDialog({ gardenId }: { gardenId: string }) {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="e.g., Loves morning sunlight"
               className="w-full rounded-2xl border border-gray-300 p-3 focus:border-green-500 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Watering Days *
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {allDays.map((day) => (
-                <button
-                  type="button"
-                  key={day}
-                  onClick={() => toggleDay(day)}
-                  className={`px-3 py-1 rounded-full text-sm transition-all ${
-                    wateringDays.includes(day)
-                      ? "bg-green-600 text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
-                >
-                  {day}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Watering Time *
-            </label>
-            <input
-              type="time"
-              value={wateringTime}
-              onChange={(e) => setWateringTime(e.target.value)}
-              className="w-full rounded-2xl border border-gray-300 p-3 focus:border-green-500 focus:outline-none"
-              required
             />
           </div>
 
