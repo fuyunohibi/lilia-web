@@ -9,17 +9,18 @@ interface LiveCamCardProps {
   title: string;
   description: string;
   videoSrc: string;
+  gardenId: string;
   onWater?: () => void;
   onFan?: () => void;
   isWaterActive?: boolean;
   isFanActive?: boolean;
 }
 
-
 const LiveCamCard = ({
   title,
   description,
   videoSrc,
+  gardenId,
   onWater,
   onFan,
   isWaterActive = false,
@@ -28,8 +29,9 @@ const LiveCamCard = ({
   const [imageSrc, setImageSrc] = useState<string>("");
 
   useEffect(() => {
-    const socket = io(videoSrc);
-  
+    const socket = io(videoSrc, {
+      auth: { gardenId }, 
+    });
     socket.on("connect", () => {
       console.log("✅ Connected to camera stream");
     });
@@ -49,7 +51,7 @@ const LiveCamCard = ({
     return () => {
       socket.disconnect();
     };
-  }, [videoSrc]);
+  }, [videoSrc, gardenId]);
   
 
   return (
