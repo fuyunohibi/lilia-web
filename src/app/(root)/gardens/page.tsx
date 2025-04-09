@@ -74,18 +74,55 @@ const GardenPage = () => {
         )
       );
 
-      const sensorCounts = await Promise.all(
-        (data || []).map(async (garden: any) => {
-          const res = await getSensorDataByGardenId(garden.garden_id);
-          console.log("garden id:", garden.garden_id, "sensors:", res.data);
-          return [garden.garden_id, res.data?.length || 0];
-        })
-      );
+      const fetchSensorCounts = async () => {
+        const counts: { [key: string]: number } = {};
+    
+        await Promise.all(
+          (data || []).map(async (garden: any) => {
+            const res = await getSensorDataByGardenId(garden.garden_id);
+            const allData = res.data || [];
+    
+            const filteredData = allData.filter(
+              (s: any) => s.device_id === garden.device_id
+            );
+    
+            const latestRow = filteredData.reduce((latest: any, current: any) => {
+              return !latest || new Date(current.timestamp) > new Date(latest.timestamp)
+                ? current
+                : latest;
+            }, null);
+    
+            let sensorCount = 0;
+    
+            if (latestRow) {
+              const sensorFields = [
+                "temperature",
+                "humidity",
+                "light",
+                "liquid_detected",
+                "soil_moisture1",
+                "soil_moisture2"
+              ];
+    
+              sensorFields.forEach((field) => {
+                if (latestRow[field] !== null && latestRow[field] !== undefined) {
+                  sensorCount += 1;
+                }
+              });
+            }
+    
+            counts[garden.garden_id] = sensorCount;
+          })
+        );
+    
+        setGardenSensorCounts(counts);
+      };
 
+      if (data?.length) {
+        fetchSensorCounts();
+      }
 
       setGardenPlantCounts(Object.fromEntries(plantCounts));
-      
-      setGardenSensorCounts(Object.fromEntries(sensorCounts));
     };
 
     loadData();
