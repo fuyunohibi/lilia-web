@@ -6,7 +6,6 @@ import {
   getTeamGardens,
 } from "@/actions/teams/teams.actions";
 import { getCurrentUser } from "@/actions/users/users.actions";
-import { getGardenSensors } from "@/actions/sensors/sensor.actions";
 import {
   Select,
   SelectContent,
@@ -20,12 +19,12 @@ import PageWrapper from "@/components/layout.tsx/page-content";
 import { cn } from "@/lib/utils";
 import AddGardenDialog from "@/components/gardens/add-garden-dialog";
 import AddPlantDialog from "@/components/plants/add-plant-dialog";
-import AddSensorDialog from "@/components/sensors/add-sensor-dialog";
 import { PlantDetailsDialog } from "@/components/plants/plant-details-dialog";
 import Image from "next/image";
 import { getPlants } from "@/actions/plants/plants.actions";
 import EditDefaultGardenDialog from "@/components/gardens/edit-default-garden-dialog";
 import EditGardenDialog from "@/components/gardens/edit-garden-dialog";
+import { getSensorDataByGardenId } from "@/actions/sensors/sensor.actions";
 
 
 const GardenPage = () => {
@@ -75,18 +74,55 @@ const GardenPage = () => {
         )
       );
 
-      const sensorCounts = await Promise.all(
-        (data || []).map(async (garden: any) => {
-          const res = await getGardenSensors(garden.garden_id);
-          // console.log("garden id:", garden.garden_id, "sensors:", res.data); // Now should be correct
-          return [garden.garden_id, res.data?.length || 0];
-        })
-      );
+      const fetchSensorCounts = async () => {
+        const counts: { [key: string]: number } = {};
+    
+        await Promise.all(
+          (data || []).map(async (garden: any) => {
+            const res = await getSensorDataByGardenId(garden.garden_id);
+            const allData = res.data || [];
+    
+            const filteredData = allData.filter(
+              (s: any) => s.device_id === garden.device_id
+            );
+    
+            const latestRow = filteredData.reduce((latest: any, current: any) => {
+              return !latest || new Date(current.timestamp) > new Date(latest.timestamp)
+                ? current
+                : latest;
+            }, null);
+    
+            let sensorCount = 0;
+    
+            if (latestRow) {
+              const sensorFields = [
+                "temperature",
+                "humidity",
+                "light",
+                "liquid_detected",
+                "soil_moisture1",
+                "soil_moisture2"
+              ];
+    
+              sensorFields.forEach((field) => {
+                if (latestRow[field] !== null && latestRow[field] !== undefined) {
+                  sensorCount += 1;
+                }
+              });
+            }
+    
+            counts[garden.garden_id] = sensorCount;
+          })
+        );
+    
+        setGardenSensorCounts(counts);
+      };
 
+      if (data?.length) {
+        fetchSensorCounts();
+      }
 
       setGardenPlantCounts(Object.fromEntries(plantCounts));
-      
-      setGardenSensorCounts(Object.fromEntries(sensorCounts));
     };
 
     loadData();
@@ -209,7 +245,6 @@ const GardenPage = () => {
 
                   <div className="flex gap-2">
                     <AddPlantDialog gardenId={garden.garden_id} />
-                    <AddSensorDialog gardenId={garden.garden_id} />
                   </div>
                 </div>
 

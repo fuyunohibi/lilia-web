@@ -19,50 +19,44 @@ interface Schedule {
   triggered?: boolean;
   active: boolean;
   created_at: string;
+  duration?: number;
+  min_moisture?: number;
 }
 
 interface ScheduleCardProps {
   fetchSchedules: () => Promise<void>;
   schedule: Schedule;
-  removeSchedule: (id: string) => void;
   setSchedules: React.Dispatch<React.SetStateAction<Schedule[]>>;
+  gardenId: string;
+  handleScheduleUpdate: (
+    id: string,
+    day: string,
+    time: string,
+    triggered: boolean,
+    active: boolean,
+    duration?: number,
+    min_moisture?: number
+  ) => Promise<void>;
 }
 
 const ScheduleCard = ({
   fetchSchedules,
   schedule,
-  removeSchedule,
   setSchedules,
+  gardenId,
+  handleScheduleUpdate,
 }: ScheduleCardProps) => {
-  const handleScheduleUpdate = async (
-    id: string,
-    day: string,
-    time: string,
-    triggered: boolean,
-    active: boolean
-  ) => {
-    const created_at = new Date().toISOString();
-    try {
-      await updateSchedule(id, day, time, triggered, active);
-      setSchedules((prev) =>
-        prev.map((s) =>
-          s.id === id ? { ...s, day, time, triggered, active, created_at } : s
-        )
-      );
-      fetchSchedules();
-    } catch (error) {
-      console.error("Error updating schedule:", error);
-    }
-  };
 
   const handleSwitchChange = (id: string, active: boolean) => {
-    console.log("Switch changed to:", id, active);
+    // console.log("Switch changed to:", id, active);
     setSchedules((prev) =>
       prev.map((s) => (s.id === id ? { ...s, active } : s))
     );
-    handleScheduleUpdate(id, schedule.day, schedule.time, false, active);
+    handleScheduleUpdate(id, schedule.day, schedule.time, false, active, schedule.duration, schedule.min_moisture);
     fetchSchedules();
   };
+
+  
 
   return (
     <motion.div className="flex min-w-60 min-h-32 m-2 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
@@ -111,7 +105,6 @@ const ScheduleCard = ({
           <RemoveScheduleDialog
             scheduleId={schedule.id}
             fetchSchedules={fetchSchedules}
-            removeSchedule={removeSchedule}
             setSchedules={setSchedules}
           />
         </div>

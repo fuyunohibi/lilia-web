@@ -9,7 +9,6 @@ const useAlertWebSocket = (gardenId: string) => {
   useEffect(() => {
     if (!gardenId) return;
 
-    // Step 1: Fetch device_id from Supabase via your own API route
     const fetchDeviceId = async () => {
       try {
         const res = await fetch("/api/alert", {
@@ -31,7 +30,7 @@ const useAlertWebSocket = (gardenId: string) => {
     if (!deviceId) return;
 
     // Step 2: Connect to WebSocket using deviceId
-    const ws = new WebSocket("ws://localhost:8080");
+    const ws = new WebSocket("ws://100.65.162.25:8080");
 
     ws.onmessage = (event) => {
       try {
