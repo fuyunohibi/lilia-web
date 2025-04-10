@@ -28,17 +28,6 @@ interface Schedule {
   min_moisture?: number;
 }
 
-const daysOfWeek = [
-  "No Repeat",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-
 const WateringSchedulePage = () => {
   const { gardenId } = useParams();
   const fullDate = dayjs().format("dddd, MMMM D YYYY");

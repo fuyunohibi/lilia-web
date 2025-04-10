@@ -1,76 +1,68 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
+import { Edit } from "lucide-react";
 import {
   Dialog,
   DialogTrigger,
   DialogContent,
   DialogTitle,
-  DialogClose,
+  DialogDescription,
   DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog";
-import { toast } from "sonner";
-import { Edit } from "lucide-react";
-import { updateSchedule } from "@/actions/gardens/schedule.actions";
+import { DAYS_OF_WEEK } from "@/constants";
 
-const daysOfWeek = [
-    "No Repeat",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-  ];
 
-function UpdateScheduleDialog({ scheduleId, schedule, fetchSchedules, handleScheduleUpdate }: { 
-    scheduleId: string; 
-    schedule: { id: string; day: string; time: string; triggered?: boolean; active: boolean };
-    fetchSchedules: () => Promise<void>; 
-    handleScheduleUpdate: (
-      id: string,
-      day: string,
-      time: string,
-      triggered: boolean,
-      active: boolean,
-      duration?: number,
-      min_moisture?: number
-    ) => Promise<void>;
+function UpdateScheduleDialog({
+  scheduleId,
+  schedule,
+  fetchSchedules,
+  handleScheduleUpdate,
+}: {
+  scheduleId: string;
+  schedule: {
+    id: string;
+    day: string;
+    time: string;
+    triggered?: boolean;
+    active: boolean;
+  };
+  fetchSchedules: () => Promise<void>;
+  handleScheduleUpdate: (
+    id: string,
+    day: string,
+    time: string,
+    triggered: boolean,
+    active: boolean,
+    duration?: number,
+    min_moisture?: number
+  ) => Promise<void>;
 }) {
+  const [open, setOpen] = useState(false);
   const [scheduleDay, setScheduleDay] = useState(schedule.day);
   const [scheduleTime, setScheduleTime] = useState(schedule.time);
-  const [scheduleTriggered, setScheduleTriggered] = useState(schedule.triggered || false);
+  const [scheduleTriggered, setScheduleTriggered] = useState(
+    schedule.triggered || false
+  );
   const [scheduleActive, setScheduleActive] = useState(schedule.active);
-  const [open, setOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("Updating schedule");
     e.preventDefault();
-    if (!scheduleDay || !scheduleTime) {
-      console.log("Invalid inputs");
-      return;
-    }
+    if (!scheduleDay || !scheduleTime) return;
 
     try {
-      console.log("Updating schedule to database");
-      handleScheduleUpdate(
+      await handleScheduleUpdate(
         scheduleId,
         scheduleDay,
         scheduleTime,
         scheduleTriggered,
         scheduleActive
       );
-      fetchSchedules();
-
-      console.log("Schedule updated successfully");
-
-      toast.success("schedule updated successfully!");
-      setScheduleTime("");
-      setScheduleDay("");
-      setScheduleTriggered(false);
-      setScheduleActive(true);
+      toast.success("Schedule updated!");
       setOpen(false);
+      fetchSchedules();
     } catch (err) {
       console.error("Failed to update schedule", err);
       toast.error("Failed to update schedule.");
@@ -80,57 +72,68 @@ function UpdateScheduleDialog({ scheduleId, schedule, fetchSchedules, handleSche
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button 
-            className="text-blue-500 hover:text-blue-600"
-        >
-            <Edit size={18} />
+        <button className="text-blue-500 hover:text-blue-600">
+          <Edit size={18} />
         </button>
       </DialogTrigger>
 
       <DialogContent>
-        <DialogTitle className="text-center text-2xl font-bold text-gray-800 dark:text-gray-200">
+        <DialogTitle className="text-center text-2xl font-bold text-gray-800">
           Edit Schedule
         </DialogTitle>
+        <DialogDescription className="text-center text-sm text-gray-600">
+          Update day and time for the watering schedule.
+        </DialogDescription>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4">
-          <select
-            value={scheduleDay}
-            onChange={(e) => setScheduleDay(e.target.value)}
-            className="p-2 mx-auto rounded-md shadow-md dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-200 w-3/4"
-          >
-            <option value="" disabled>Select a day</option>
-            {daysOfWeek.map((day) => (
-              <option key={day} value={day}>{day}</option>
-            ))}
-          </select>
-
-          <input
-            type="time"
-            value={scheduleTime}
-            onChange={(e) => setScheduleTime(e.target.value)}
-            className="p-2 mx-auto rounded-md shadow-md dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-200 w-3/4"
-          />
-    
-          <DialogFooter className="mt-4 mx-auto gap-8">
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="flex items-center justify-center h-12 px-5 rounded-full bg-neutral-500 text-white shadow-lg cursor-pointer hover:bg-neutral-600 transition duration-200"
+        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Day of Week
+            </label>
+            <select
+              value={scheduleDay}
+              onChange={(e) => setScheduleDay(e.target.value)}
+              className="w-full rounded-2xl border border-gray-300 p-3 focus:border-[#00A35B] focus:outline-none"
             >
-              <h1 className="text-xl font-semibold">Cancel</h1>
-            </button>
+              <option value="" disabled>
+                Select a day
+              </option>
+              {DAYS_OF_WEEK.map((day) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Time
+            </label>
+            <input
+              type="time"
+              value={scheduleTime}
+              onChange={(e) => setScheduleTime(e.target.value)}
+              className="w-full rounded-2xl border border-gray-300 p-3 focus:border-[#00A35B] focus:outline-none"
+            />
+          </div>
+
+          <DialogFooter>
             <button
               type="submit"
-              onClick={() => setOpen(false)}
               disabled={!scheduleDay || !scheduleTime}
-              className="flex items-center justify-center h-12 px-5 rounded-full bg-green-500 text-white shadow-lg cursor-pointer hover:bg-green-600 transition duration-200"
+              className={`w-full rounded-full px-4 py-2 text-white ${
+                !scheduleDay || !scheduleTime
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-[#00A35B] hover:bg-[#029b56]"
+              }`}
             >
-              <h1 className="text-xl font-semibold">Update</h1>
+              Update Schedule
             </button>
           </DialogFooter>
         </form>
 
-        <DialogClose className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-white">
+        <DialogClose className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
           <span className="sr-only">Close</span>
         </DialogClose>
       </DialogContent>
