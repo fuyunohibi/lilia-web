@@ -58,7 +58,7 @@ const SensorSmallCard: React.FC<SensorCardProps> = ({ data, history }) => {
     const sensorList = ["temperature", "humidity", "light", "soil moisture"];
 
     return (
-        <div className="grid grid-cols-4 col-start-1 col-end-4 gap-6 relative h-full w-full flex flex-col justify-between ">
+        <div className="grid grid-cols-2 lg:grid-cols-4 col-start-1 col-end-4 gap-6 relative h-full w-full  flex-col justify-between ">
             {/* Loop sensors */}
             {sensorList.map((sensor, index) => (
             <motion.div
@@ -97,7 +97,7 @@ const SensorSmallCard: React.FC<SensorCardProps> = ({ data, history }) => {
                         : sensor === "humidity"
                         ? `${formatValue(data.humidity, "humidity")}%`
                         : sensor === "light"
-                        ? `${formatValue(data.light, "light")}`
+                        ? `${formatValue(data.light, "light")}%`
                         : sensor === "soil moisture"
                         ? `${averageMoisture}%`
                         : sensor.charAt(0).toUpperCase() + sensor.slice(1)}
