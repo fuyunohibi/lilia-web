@@ -39,7 +39,7 @@ const ActuatorCard = ({
 
       {/* Switch */}
       <motion.div
-        className="absolute top-5 right-5 z-20"
+        className="absolute bottom-5 md:top-5 right-5 z-20"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.5 }}
