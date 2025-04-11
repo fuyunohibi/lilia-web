@@ -97,7 +97,7 @@ const SensorSmallCard: React.FC<SensorCardProps> = ({ data, history }) => {
                         : sensor === "humidity"
                         ? `${formatValue(data.humidity, "humidity")}%`
                         : sensor === "light"
-                        ? `${formatValue(data.light, "light")}`
+                        ? `${formatValue(data.light, "light")}%`
                         : sensor === "soil moisture"
                         ? `${averageMoisture}%`
                         : sensor.charAt(0).toUpperCase() + sensor.slice(1)}
